@@ -1,0 +1,188 @@
+#homepagebody .ant-menu-root{
+    height: 950px;
+}
+#homepagebody .Lowalar-left{
+    margin-top: 24px;
+}
+.homepage{
+    height: 50px;
+    background: #00284D;
+    width: 100%;
+    line-height: 36px;
+    color: white;
+    overflow: hidden;
+    text-align: center;
+    padding: 7px;
+    font-size: 15px;   
+}
+#homepagebody .Administrator{
+    float: right;
+    height: 50px;
+    line-height: 40px;
+    padding-right: 40px;
+    display: flex;
+    align-items: center;
+}
+#homepagebody .ant-cascader-picker{
+    display: inline-block;
+    width: 50%;
+    margin-right: 20px;
+}
+#homepagebody .Administrator i{
+    margin-right: 25px;
+}
+#homepagebody .Administrator  span{
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: red;
+    display: inline-block;
+}
+#homepagebody .top{
+    height: 50px;
+    background: #00284D;
+    width: 100%;
+    line-height: 36px;
+    color: white;
+    overflow: hidden;
+    text-align: center;
+    padding: 7px;
+    font-size: 13px;
+}
+#homepagebody .switch-btn{
+    float: left;
+}
+#homepagebody .Lowalar-right{
+    float: left;
+    margin-top: 24px;
+    width: 77%;
+}
+#homepagebody .Lowalar-rt{
+    border-bottom: 1px solid #999;
+    height: 50px;
+    width: 100%;
+    padding-left: 20px;
+}
+#homepagebody .nav{
+    height:182px;
+    margin: 10px 16px 24px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+#homepagebody .navhead{
+    background: white;
+    height: 182px;
+    width: 100%;
+    padding: 10px;
+    position: relative;
+}
+#homepagebody .number{
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 50px;
+    height: 50px;
+    font-weight: bold;
+}
+#homepagebody .number span{
+    display: inline-block;
+    font-size: 40px;
+    margin-right: 10px;
+}
+#homepagebody .beizhu{
+    position: absolute;
+    bottom:0;
+}
+#homepagebody .navtitle{
+    font-size: 20px;
+}
+#homepagebody .highcharts-root{
+    width: 100% !important; 
+}
+#homepagebody .ant-tabs-bar{
+    margin-bottom: 0 !important;
+}
+#homepagebody .highcharts-container {
+    width: 100% !important; 
+}
+#homepagebody #report{
+    padding-top: 20px;
+    padding-left: 2%;
+    padding-right: 2%;
+    color: #333;
+    overflow: hidden;
+    text-align: center;
+    width:100%;
+    height:350px;
+    background: white;
+    float: left;
+}
+#homepagebody .tit{
+    font-size: 20px;
+    background: white;
+    height: 50px;
+    line-height: 50px;
+    color: rgba(0, 0, 0, 0.847058823529412);
+    font-weight: bold;
+    padding-left: 20px;
+}
+#homepagebody .ant-tabs-nav{
+    float: right;
+}
+#homepagebody .diagram{
+    margin-top: 20px;
+    background: white;
+    position: relative;
+
+}
+/*当前/历史*/
+#homepagebody .current{
+    float: left;
+    width: 100%;
+    background: #F0F2F5;
+}
+#homepagebody .ant-tabs-bar{
+    border:none;
+}
+#homepagebody .ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab{
+    float: left;
+    margin-right: 0;
+    border:none;
+    border-radius: 0;
+}
+#homepagebody .current_text{
+    background: white;
+    width: 100%;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+#homepagebody .ant-select{
+    width: 110px ;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+/*起始时间*/
+#homepagebody .current-time{
+    height: 40px;
+    line-height: 40px;
+    margin-top: 10px;
+}
+/*导出*/
+#homepagebody .derive{
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background:rgba(230, 247, 255, 1);
+    border:1px solid rgba(186, 231, 255, 1);
+    margin-top: 10px;
+    padding-left: 15px;
+    border-radius: 5px;
+    padding-right: 5px;
+}
+#homepagebody .ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+    padding: 10px 10px;
+    text-align: center
+}

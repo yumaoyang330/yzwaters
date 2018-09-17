@@ -1,0 +1,61 @@
+#loginmbody{
+    background: url(background.jpg) no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#loginmbody  .login-form {
+    max-width: 300px;
+    margin:0 auto
+  }
+#loginmbody   .login-form-forgot {
+    float: right;
+  }
+#loginmbody    .login-form-button {
+    width: 100%;
+  }
+  #loginmbody  .ant-input{
+      height: 40px;
+      line-height: 40px;
+  }
+#loginmbody .title{
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 40px;
+    color: rgba(0, 0, 0, 0.427450980392157);
+    line-height: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    margin-top: 250px;
+}
+
+@media screen and (max-width: 600px) {
+    #loginmbody .title{
+        font-size: 30px;
+    }
+}
+@media screen and (max-width: 400px) {
+    #loginmbody .title{
+        font-size: 25px;
+    }
+}
+@media screen and (max-width: 330px) {
+    #loginmbody .title{
+        font-size: 20px;
+    }
+}
+@media screen and (max-width: 270px) {
+    #loginmbody .title{
+        font-size: 16px;
+    }
+}
+@media screen and (max-width: 210px) {
+    #loginmbody .title{
+        font-size: 12px;
+    }
+}
