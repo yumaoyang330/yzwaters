@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, DatePicker ,Input} from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, DatePicker, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -9,83 +9,33 @@ import './confirm.css';
 
 const dateFormat = 'YYYY/MM/DD HH:mm:ss';
 const myDate = new Date();
-const {RangePicker } = DatePicker;
+const { RangePicker } = DatePicker;
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
 class journal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       collapsed: false,
-      time:myDate,
+      time: myDate,
     };
     this.columns = [{
-      title: '历史标识',
+      title: '单号',
       dataIndex: 'deviceId',
     }, {
-      title: '设备编号',
+      title: '订单内容',
       dataIndex: 'location',
     }, {
-      title: '设备MAC',
+      title: '发货时间',
       dataIndex: 'status',
     }, {
-      title: '当前状态',
+      title: '发货地址',
+      dataIndex: 'status',
+    }, {
+      title: '操作',
       dataIndex: 'siteName',
-    }, {
-      title: 'OTA状态',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '所属网点',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '前版本号',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '升级目标版本号',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '当前版本号',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '下发时间',
-      dataIndex: 'resPerson.name',
-    }, {
-      title: '结束时间',
-      dataIndex: 'lastConnectTime',
     }
     ];
   }
@@ -143,10 +93,16 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                <div className="homepage" ><a href="" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "100%", borderRadius: '5px' }}>水表管理平台</a></div>
-                <div className="homepages" ><Link to="/homepage"><a href="" style={{ background: '#001529', color: 'white', display: "block", width: "100%", paddingLeft: "24px" }}>
-                  <Icon type="bar-chart" style={{ marginRight: '10px' }} />数据概览</a></Link>
-                </div>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                  <Icon type="windows" />
+                  <span>水表管理平台</span>
+                </Menu.Item>
+                <Menu.Item key="0">
+                  <Link to="/homepage">
+                    <Icon type="bar-chart" />
+                    <span>数据概览</span>
+                  </Link>
+                </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
                   <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
@@ -171,7 +127,6 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub6" title={<span><Icon type="sync" /><span>生命周期</span></span>}>
                   <Menu.Item key="13"><Link to="/lifecycle">基本信息</Link></Menu.Item>
-                  <Menu.Item key="14"><Link to="/status">出场测试</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub7" title={<span><Icon type="dashboard" /><span>OTA</span></span>}>
                   <Menu.Item key="15"><Link to="/history">历史记录</Link></Menu.Item>
@@ -179,10 +134,9 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub8" title={<span><Icon type="warning" /><span>产品监控</span></span>}>
                   <Menu.Item key="17"><Link to="/instorage">产品入库</Link></Menu.Item>
-                  <Menu.Item key="18"><Link to="/check">出厂检定</Link></Menu.Item>
                   <Menu.Item key="19"><Link to="/sendout">产品发货</Link></Menu.Item>
-                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>    
-                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>               
+                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>
+                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>
                 </SubMenu>
               </Menu>
             </div>
@@ -211,18 +165,8 @@ class journal extends React.Component {
             <div className="tit">
               确认收货
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-              位置选择：<Cascader
-                defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                options={options}
-                onChange={this.onChange}
-                changeOnSelect style={{ marginLeft: '10px' }}
-              />
-              <div style={{ float: "right" }}>
-                <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
-                <Button>重置</Button>
-              </div>
-              <div style={{marginTop:'10px'}}>
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, paddingTop: '10px' }}>
+              <div style={{ marginTop: '10px' }}>
                 时间选择:
                   <RangePicker
                   style={{ marginLeft: '20px', marginRight: '20px' }}
@@ -231,9 +175,13 @@ class journal extends React.Component {
                   ranges={{ 今天: [moment().startOf('day'), moment().endOf('day')], '本月': [moment().startOf('month'), moment().endOf('month')] }}
                   onChange={this.timeonChange}
                 />
-                 网点名:<Input placeholder="1234567890" style={{width:'10%',marginLeft:'10px',marginRight:'10px'}}  id="lsimei"/>
-                 OTA前版本:<Input placeholder="1234567890" style={{width:'10%',marginLeft:'10px'}}  id="lsimei"/>
+                单号查询:<Input placeholder="请输入单号" style={{ width: '20%', marginLeft: '10px', marginRight: '10px' }} />
+                <div style={{ float: "right" }}>
+                  <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
+                  <Button>重置</Button>
+                </div>
               </div>
+
               <div className="derive">
                 <Icon type="info-circle-o" />
                 &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>

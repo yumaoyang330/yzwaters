@@ -1,7 +1,7 @@
-#lifecyclebody .ant-menu-root{
+#connectorbody .ant-menu-root{
     height: 950px;
 }
-#lifecyclebody .Layout-right{
+#connectorbody .Layout-right{
     float: left;
     margin-top: 24px;
     width: 77%;
@@ -26,12 +26,12 @@
     overflow: hidden;
     font-size: 15px;       
 }
-#lifecyclebody .ant-cascader-picker {
+#connectorbody .ant-cascader-picker {
     display: inline-block;
     width: 50%;
     margin-right: 20px;
 }
-#lifecyclebody .Administrator{
+#connectorbody .Administrator{
     float: right;
     height: 64px;
     line-height: 64px;
@@ -39,13 +39,13 @@
     display: flex;
     align-items: center;
 }
-#lifecyclebody .nav{
+#connectorbody .nav{
     height:30px;
     line-height: 30px;
     padding-left: 20px;
     background: white;
 }
-#lifecyclebody .tit{
+#connectorbody .tit{
     font-size: 20px;
     background: white;
     height: 50px;
@@ -54,7 +54,7 @@
     font-weight: bold;
     padding-left: 20px;
 }
-#lifecyclebody .derive{
+#connectorbody .derive{
     width: 100%;
     height: 40px;
     line-height: 40px;
@@ -65,24 +65,24 @@
     border-radius: 5px;
     padding-right: 5px;
 }
-#lifecyclebody .current{
+#connectorbody .current{
     float: left;
     width: 100%;
     background: #F0F2F5;
 }
-#lifecyclebody .ant-tabs-bar{
+#connectorbody .ant-tabs-bar{
     margin:0;
 }
-#lifecyclebody .ant-tabs-bar{
+#connectorbody .ant-tabs-bar{
     border:none;
     margin-bottom: 0px !important;
 }
-#lifecyclebody .ant-tabs-nav-scroll{
+#connectorbody .ant-tabs-nav-scroll{
     float: left;
     width: 100%;
     background: #F0F2F5;
 }
-#lifecyclebody .ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab{
+#connectorbody .ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab{
     float: left;
     margin-right: 0;
     border:none;
@@ -90,7 +90,7 @@
     background: #F0F2F5;
     color:#333;
 }
-#lifecyclebody .ant-tabs-tab-active{
+#connectorbody .ant-tabs-tab-active{
     color: #1890ff !important;
     background: white !important;
     padding-bottom: 2px;

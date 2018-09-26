@@ -1,68 +1,36 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, message } from 'antd';
+import { gets, site } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './product.css';
 
 const Option = Select.Option;
+
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
+
 class journal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       collapsed: false,
+      dataSource: '',
     };
     this.columns = [{
       title: '产品类别',
-      dataIndex: 'deviceId',
-      editable: true,
+      dataIndex: 'label',
     }, {
       title: '产品名称',
-      dataIndex: 'location',
-      editable: true,
+      dataIndex: '',
     }, {
       title: '型号',
-      dataIndex: 'status',
-      editable: true,
+      dataIndex: 'level',
     }, {
       title: '网络运营商',
-      dataIndex: 'siteName',
-      editable: true,
+      dataIndex: 'id',
     }, {
       title: '版本',
       dataIndex: 'resPerson.name',
@@ -89,8 +57,32 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+
+    gets().then(res => {
+      if (res.data && res.data.message === 'success') {
+        console.log(res.data.level)
+        this.setState({
+          dataSource: res.data.data,
+          num: res.data.data.length,
+        });
+        localStorage.setItem('cascadedlocation', res.data.data);
+      } else if (res.data && res.data.status === 0) {
+        message.error("鉴权失败，需要用户重新登录");
+      } else if (res.data && res.data.status === 2) {
+        message.error("参数提取失败");
+      } else if (res.data && res.data.status === 3) {
+        message.error("服务器故障，请刷新再试");
+      }
+    });
+
+
+
+
+
   }
   render() {
+    const options = this.state.dataSource;
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
@@ -128,10 +120,16 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                <div className="homepage" ><a href="" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "100%", borderRadius: '5px' }}>水表管理平台</a></div>
-                <div className="homepages" ><Link to="/homepage"><a href="" style={{ background: '#001529', color: 'white', display: "block", width: "100%", paddingLeft: "24px" }}>
-                  <Icon type="bar-chart" style={{ marginRight: '10px' }} />数据概览</a></Link>
-                </div>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                  <Icon type="windows" />
+                  <span>水表管理平台</span>
+                </Menu.Item>
+                <Menu.Item key="0">
+                  <Link to="/homepage">
+                    <Icon type="bar-chart" />
+                    <span>数据概览</span>
+                  </Link>
+                </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
                   <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
@@ -156,7 +154,6 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub6" title={<span><Icon type="sync" /><span>生命周期</span></span>}>
                   <Menu.Item key="13"><Link to="/lifecycle">基本信息</Link></Menu.Item>
-                  <Menu.Item key="14"><Link to="/status">出场测试</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub7" title={<span><Icon type="dashboard" /><span>OTA</span></span>}>
                   <Menu.Item key="15"><Link to="/history">历史记录</Link></Menu.Item>
@@ -164,10 +161,9 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub8" title={<span><Icon type="warning" /><span>产品监控</span></span>}>
                   <Menu.Item key="17"><Link to="/instorage">产品入库</Link></Menu.Item>
-                  <Menu.Item key="18"><Link to="/check">出厂检定</Link></Menu.Item>
                   <Menu.Item key="19"><Link to="/sendout">产品发货</Link></Menu.Item>
-                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>    
-                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>               
+                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>
+                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>
                 </SubMenu>
               </Menu>
             </div>
@@ -197,12 +193,7 @@ class journal extends React.Component {
               产品信息
             </div>
             <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-              位置选择：<Cascader
-                defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                options={options}
-                onChange={this.onChange}
-                changeOnSelect style={{ marginLeft: '10px' }}
-              />
+              产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} />
               <div style={{ float: "right" }}>
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                 <Button>重置</Button>
@@ -219,7 +210,7 @@ class journal extends React.Component {
               <div style={{ marginTop: '10px' }}>
                 <Table
                   rowSelection={rowSelection}
-                  dataSource={this.state.data}
+                  dataSource={this.state.dataSource}
                   columns={columns}
                   rowClassName="editable-row"
                 />

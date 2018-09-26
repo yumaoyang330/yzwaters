@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "antd": "^3.8.1",
+    "antd-mobile": "^2.2.5",
+    "axios": "^0.18.0",
     "highcharts": "^6.1.2",
-    "react": "^16.4.2",
+    "react": "^16.5.2",
     "react-amap": "^1.2.7",
     "react-dom": "^16.4.2",
     "react-router-dom": "^4.3.1",

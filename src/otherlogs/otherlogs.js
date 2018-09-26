@@ -123,10 +123,16 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                <div className="homepage" ><a href="" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "100%", borderRadius: '5px' }}>水表管理平台</a></div>
-                <div className="homepages" ><Link to="/homepage"><a href="" style={{ background: '#001529', color: 'white', display: "block", width: "100%", paddingLeft: "24px" }}>
-                  <Icon type="bar-chart" style={{ marginRight: '10px' }} />数据概览</a></Link>
-                </div>
+     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                  <Icon type="windows" />
+                  <span>水表管理平台</span>
+                </Menu.Item>
+                <Menu.Item key="0">
+                  <Link to="/homepage">
+                    <Icon type="bar-chart" />
+                    <span>数据概览</span>
+                  </Link>
+                </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
                   <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
@@ -151,7 +157,6 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub6" title={<span><Icon type="sync" /><span>生命周期</span></span>}>
                   <Menu.Item key="13"><Link to="/lifecycle">基本信息</Link></Menu.Item>
-                  <Menu.Item key="14"><Link to="/status">出场测试</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub7" title={<span><Icon type="dashboard" /><span>OTA</span></span>}>
                   <Menu.Item key="15"><Link to="/history">历史记录</Link></Menu.Item>
@@ -159,10 +164,9 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub8" title={<span><Icon type="warning" /><span>产品监控</span></span>}>
                   <Menu.Item key="17"><Link to="/instorage">产品入库</Link></Menu.Item>
-                  <Menu.Item key="18"><Link to="/check">出厂检定</Link></Menu.Item>
                   <Menu.Item key="19"><Link to="/sendout">产品发货</Link></Menu.Item>
-                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>    
-                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>               
+                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>
+                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>
                 </SubMenu>
               </Menu>
             </div>

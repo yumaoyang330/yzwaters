@@ -99,6 +99,32 @@ class journal extends React.Component {
       editable: true,
     }];
 
+    this.ptcolumn = [{
+      title: '产品种类',
+      dataIndex: 'deviceId',
+      editable: true,
+    }, {
+      title: '设备编号',
+      dataIndex: 'location',
+      editable: true,
+    }, {
+      title: '设备状态',
+      dataIndex: 'status',
+      editable: true,
+    }, {
+      title: '操作员信息',
+      dataIndex: 'siteName',
+      editable: true,
+    }, {
+      title: '操作时间',
+      dataIndex: 'resPerson.name',
+      editable: true,
+    }, {
+      title: '备注信息',
+      dataIndex: 'resPerson.name',
+      editable: true,
+    }];
+
 
   };
 
@@ -140,7 +166,22 @@ class journal extends React.Component {
         }),
       };
     });
-    const column = this.columns.map((col) => {
+    const column = this.column.map((col) => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: record => ({
+          record,
+          inputType: col.dataIndex === 'age' ? 'number' : 'text',
+          dataIndex: col.dataIndex,
+          title: col.title,
+        }),
+      };
+    });
+
+    const ptcolumn = this.ptcolumn.map((col) => {
       if (!col.editable) {
         return col;
       }
@@ -171,10 +212,16 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                <div className="homepage" ><a href="" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "100%", borderRadius: '5px' }}>水表管理平台</a></div>
-                <div className="homepages" ><Link to="/homepage"><a href="" style={{ background: '#001529', color: 'white', display: "block", width: "100%", paddingLeft: "24px" }}>
-                  <Icon type="bar-chart" style={{ marginRight: '10px' }} />数据概览</a></Link>
-                </div>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                  <Icon type="windows" />
+                  <span>水表管理平台</span>
+                </Menu.Item>
+                <Menu.Item key="0">
+                  <Link to="/homepage">
+                    <Icon type="bar-chart" />
+                    <span>数据概览</span>
+                  </Link>
+                </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
                   <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
@@ -199,7 +246,6 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub6" title={<span><Icon type="sync" /><span>生命周期</span></span>}>
                   <Menu.Item key="13"><Link to="/lifecycle">基本信息</Link></Menu.Item>
-                  <Menu.Item key="14"><Link to="/status">出场测试</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub7" title={<span><Icon type="dashboard" /><span>OTA</span></span>}>
                   <Menu.Item key="15"><Link to="/history">历史记录</Link></Menu.Item>
@@ -207,10 +253,9 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub8" title={<span><Icon type="warning" /><span>产品监控</span></span>}>
                   <Menu.Item key="17"><Link to="/instorage">产品入库</Link></Menu.Item>
-                  <Menu.Item key="18"><Link to="/check">出厂检定</Link></Menu.Item>
                   <Menu.Item key="19"><Link to="/sendout">产品发货</Link></Menu.Item>
-                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>    
-                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>               
+                  <Menu.Item key="20"><Link to="/confirm">确认收货</Link></Menu.Item>
+                  <Menu.Item key="21"><Link to="/maintenance">产品维修</Link></Menu.Item>
                 </SubMenu>
               </Menu>
             </div>
@@ -243,7 +288,7 @@ class journal extends React.Component {
               <div className="current">
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
-                    <TabPane tab="设备总览" key="1" style={{ padding: '20px' }}>
+                    <TabPane tab="无线单表" key="1" style={{ padding: '20px' }}>
                       位置选择：<Cascader
                         defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
                         options={options}
@@ -271,7 +316,7 @@ class journal extends React.Component {
                         />
                       </div>
                     </TabPane>
-                    <TabPane tab="详细信息" key="2" style={{ padding: '20px' }}>
+                    <TabPane tab="采集器" key="2" style={{ padding: '20px' }}>
                       位置选择：<Cascader
                         defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
                         options={options}
@@ -295,6 +340,35 @@ class journal extends React.Component {
                           rowSelection={rowSelection}
                           dataSource={this.state.dataSource}
                           columns={column}
+                          rowClassName="editable-row"
+                        />
+                      </div>
+                    </TabPane>
+
+                    <TabPane tab="普通水表" key="3" style={{ padding: '20px' }}>
+                      位置选择：<Cascader
+                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
+                        options={options}
+                        onChange={this.onChange}
+                        changeOnSelect style={{ marginLeft: '10px' }}
+                      />
+                      <div style={{ float: "right" }}>
+                        <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
+                        <Button>重置</Button>
+                      </div>
+                      <div className="derive">
+                        <Icon type="info-circle-o" />
+                        &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
+                          {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
+                        </span>条记录
+                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
+                      </div>
+                      <div style={{ marginTop: '10px' }}>
+                        <Table
+                          rowSelection={rowSelection}
+                          dataSource={this.state.dataSources}
+                          columns={ptcolumn}
                           rowClassName="editable-row"
                         />
                       </div>
