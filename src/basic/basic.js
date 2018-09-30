@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal,message } from 'antd';
-import { device } from '../axios';
+import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal,message } from 'antd';
+import { wirelessbasic,generalbasic,collectorbasic } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -10,38 +10,6 @@ const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -51,31 +19,69 @@ class journal extends React.Component {
 
     this.column = [{
       title: '发货单位',
-      dataIndex: 'deviceId',
+      dataIndex: '发货单位',
     }, {
       title: '历史读数',
       dataIndex: 'location',
+      render: (text, record, index) =>
+      <div>
+        <a onClick={() => this.showModal(record.key)}
+        >详情</a>
+        <Modal
+          title="联系方式"
+          // maskStyle={{ background: "black", opacity: '0.1' }}
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          mask={false}
+        >
+          <p>姓名:{this.state.name}</p>
+          <p>电话:{this.state.phone}</p>
+          <p>邮箱:{this.state.email}</p>
+          <p>地址:{this.state.organization}</p>
+          <p>备注:{this.state.content}</p>
+        </Modal>
+      </div>
     }, {
       title: '水表编号',
-      dataIndex: 'status',
+      dataIndex: 'district_id',
     }, {
       title: '网络运营商',
-      dataIndex: 'siteName',
+      dataIndex: '网络运营商',
     }, {
       title: '水表类型',
-      dataIndex: 'resPerson.name',
+      dataIndex: '水表类型',
     }, {
       title: '连网IP，连网端口',
-      dataIndex: 'resPerson.name',
+      dataIndex: '连网IP，连网端口',
     }, {
       title: '安装起始读数',
-      dataIndex: 'resPerson.name',
+      dataIndex: '起始读数',
     }, {
       title: '设备生命周期',
       dataIndex: 'resPerson.name',
+      render: (text, record, index) =>
+      <div>
+        <a onClick={() => this.showModal(record.key)}
+        >详情</a>
+        <Modal
+          title="联系方式"
+          // maskStyle={{ background: "black", opacity: '0.1' }}
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          mask={false}
+        >
+          <p>姓名:{this.state.name}</p>
+          <p>电话:{this.state.phone}</p>
+          <p>邮箱:{this.state.email}</p>
+          <p>地址:{this.state.organization}</p>
+          <p>备注:{this.state.content}</p>
+        </Modal>
+      </div>
     }, {
       title: '设备安装时间',
-      dataIndex: 'resPerson.name',
+      dataIndex: '设备安装时间',
     }, {
       title: '详情',
       dataIndex: 'resPerson.name',
@@ -102,58 +108,77 @@ class journal extends React.Component {
 
     this.sbcolumn = [{
       title: '水表编号',
-      dataIndex: 'deviceId',
+      dataIndex: 'general_num',
     }, {
       title: '水表门牌号',
-      dataIndex: 'location',
+      dataIndex: '水表门牌号',
     }, {
       title: '软件版本',
-      dataIndex: 'status',
+      dataIndex: '软件版本',
     }, {
       title: '所属采集器号',
-      dataIndex: 'siteName',
+      dataIndex: '所属采集器号',
     }, {
       title: '所属发货单号',
-      dataIndex: 'resPerson.name',
+      dataIndex: '所属发货单号',
     }];
   
 
     this.columns = [{
       title: 'IMEI',
-      dataIndex: 'deviceId',
+      dataIndex: 'IMEI',
     }, {
       title: '版本号',
-      dataIndex: 'location',
+      dataIndex: '版本号',
     }, {
       title: '集中器号',
-      dataIndex: 'status',
+      dataIndex: 'collector_num',
     }, {
       title: '集中器类型',
-      dataIndex: 'siteName',
+      dataIndex: '集中器类型',
     }, {
       title: '电流',
-      dataIndex: 'resPerson.name',
+      dataIndex: '电流',
     }, {
       title: '电压',
-      dataIndex: 'lastConnectTime',
+      dataIndex: '电压',
     },
     {
       title: 'ICCID',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'ICCID',
     }, {
       title: '所属客户地区',
-      dataIndex: 'lastConnectTime',
+      dataIndex: '所属客户地区',
     },
     {
       title: '设备生命周期',
       dataIndex: 'lastConnectTime',
+      render: (text, record, index) =>
+      <div>
+        <a onClick={() => this.showModal(record.key)}
+        >详情</a>
+        <Modal
+          title="联系方式"
+          // maskStyle={{ background: "black", opacity: '0.1' }}
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          mask={false}
+        >
+          <p>姓名:{this.state.name}</p>
+          <p>电话:{this.state.phone}</p>
+          <p>邮箱:{this.state.email}</p>
+          <p>地址:{this.state.organization}</p>
+          <p>备注:{this.state.content}</p>
+        </Modal>
+      </div>
     },
     {
       title: '设备安装时间',
-      dataIndex: 'lastConnectTime',
+      dataIndex: '设备安装时间',
     },  {
       title: '所属发货单号',
-      dataIndex: 'lastConnectTime',
+      dataIndex: '所属发货单号',
     },
     ];
   }
@@ -176,25 +201,50 @@ class journal extends React.Component {
     setInterval(showTime, 1000);
 
 
-    device([
-      '%7B',
-      2,
+    wirelessbasic([
+      '',
       '',
       '',
       '',
     ]).then(res => {
-      if (res.data && res.data.status === 1) {
-        console.log(res.data)
+      if (res.data && res.data.message === 'success') {
+        console.log(res.data.data)
         this.setState({
-          dataSource: res.data.data,
+          dbdata: res.data.data,
+          num1: res.data.data.length,
+        });
+      }
+    });
+
+
+    collectorbasic([
+      '',
+      '',
+      '',
+      '',
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
+        console.log(res.data.data)
+        this.setState({
+          data: res.data.data,
           num: res.data.data.length,
         });
-      } else if (res.data && res.data.status === 0) {
-        message.error("鉴权失败，需要用户重新登录");
-      } else if (res.data && res.data.status === 2) {
-        message.error("参数提取失败");
-      } else if (res.data && res.data.status === 3) {
-        message.error("服务器故障，请刷新再试");
+      }
+    });
+
+
+    generalbasic([
+      '',
+      '',
+      '',
+      '',
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
+        console.log(res.data.data)
+        this.setState({
+          dataSource: res.data.data,
+          num2: res.data.data.length,
+        });
       }
     });
   }
@@ -344,12 +394,8 @@ class journal extends React.Component {
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
                     <TabPane tab="采集器" key="1" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px',marginRight:'10px' }}  id="productid"/>
+                    所属水务商:<Input placeholder="请输入水务商名称" style={{ width: '20%', marginLeft: '10px' }}  id="sws"/>
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -372,12 +418,7 @@ class journal extends React.Component {
                       </div>
                     </TabPane>
                     <TabPane tab="无线单表" key="2" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }}  id="productid"/>
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -387,25 +428,20 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num1}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table
                           rowSelection={rowSelection}
-                          dataSource={this.state.dataSource}
+                          dataSource={this.state.dbdata}
                           columns={column}
                           rowClassName="editable-row"
                         />
                       </div>
                     </TabPane>
                     <TabPane tab="普通水表" key="3" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }}  id="productid"/>
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -415,7 +451,7 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num2}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>

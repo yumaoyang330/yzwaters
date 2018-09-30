@@ -95,7 +95,7 @@ class journal extends React.Component {
       };
     });
     return (
-      <div id="productbody" >
+      <div id="connectorbody" >
         <Layout>
           <Sider
             trigger={null}

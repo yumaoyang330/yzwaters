@@ -32,6 +32,7 @@ import role from './role/role';
 import roleassignment from './roleassignment/roleassignment';
 import power from './power/power';
 import powerassignment from './powerassignment/powerassignment';
+import newadd from './newadd/newadd';
 
 ReactDOM.render(
   <Router >
@@ -44,6 +45,7 @@ ReactDOM.render(
       <Route path="/login" component={login} />
       {/* <Route path="/information"> */}
         <Route path='/product' component={product} />
+        <Route path='/newadd' component={newadd} />
         <Route path='/area' component={area} />
         <Route path='/journal' component={journal} />
         <Route path='/datalogs' component={datalogs} />

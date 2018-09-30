@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
 import { Link } from 'react-router-dom';
+import { site} from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './area.css';
@@ -9,38 +10,7 @@ const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
+
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -50,27 +20,21 @@ class journal extends React.Component {
     this.columns = [{
       title: '小区名称',
       dataIndex: 'deviceId',
-      editable: true,
     }, {
       title: '详细地址',
       dataIndex: 'location',
-      editable: true,
     }, {
       title: '设备数量',
       dataIndex: 'status',
-      editable: true,
     }, {
       title: '负责人姓名',
       dataIndex: 'siteName',
-      editable: true,
     }, {
       title: '负责人电话',
       dataIndex: 'resPerson.name',
-      editable: true,
     }, {
       title: '操作',
       dataIndex: 'lastConnectTime',
-      editable: true,
     },
     ];
   }
@@ -89,8 +53,28 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        site([
+          1
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data[0].value)
+            this.setState({
+              area: res.data.data,
+              pro:res.data.data[0].value,
+              city:res.data.data[0].children[0].value,
+              county:res.data.data[0].children[0].children[0].value,
+              qu:res.data.data[0].children[0].children[0].children[0].value,
+            });
+          } 
+        });
+      }
+      })
   }
   render() {
+    const options =this.state.area;
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
@@ -200,9 +184,9 @@ class journal extends React.Component {
             <div className="tit">
               区域信息
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 ,paddingTop:'10px' }}>
               位置选择：<Cascader
-                defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
+                defaultValue={[this.state.pro, this.state.city, this.state.county, this.state.qu]}
                 options={options}
                 onChange={this.onChange}
                 changeOnSelect style={{ marginLeft: '10px' }}

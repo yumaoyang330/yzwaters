@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Popconfirm,message } from 'antd';
+import { waterMerchant,waterdelete} from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -49,34 +50,67 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '水务商名称',
-      dataIndex: 'deviceId',
-      editable: true,
+      dataIndex: 'name',
     }, {
       title: '详细地址',
-      dataIndex: 'location',
-      editable: true,
+      dataIndex: 'district_detail',
+    }, {
+      title: '设备总数量(台)',
+      dataIndex: '设备总数量',
+    }, {
+      title: '已安装设备数量(台)',
+      dataIndex: '已安装设备数量',
     }, {
       title: '负责人信息',
-      dataIndex: 'status',
-      editable: true,
+      dataIndex: 'linkman',
     }, {
       title: '服务器信息',
-      dataIndex: 'siteName',
-      editable: true,
-    }, {
-      title: '备注',
-      dataIndex: 'resPerson.name',
-      editable: true,
+      dataIndex: 'server',
     }, {
       title: '操作',
-      dataIndex: 'lastConnectTime',
-      editable: true,
-    }
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        return (
+          <div>
+            <span style={{ marginLeft: '10px' }}>
+              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
+                <a href="javascript:;">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        );
+      },
+    },
     ];
   }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
+    });
+  }
+
+
+  onDelete = (text,key) => {
+    console.log(text)
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        waterdelete([
+          text,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            message.success("信息删除成功");
+            const dataSource = [...this.state.dataSource];
+            this.setState({
+              num: this.state.num - 1,
+              dataSource: dataSource.filter(item => item.key !== key)
+            });
+            setTimeout(() => {
+              window.location.href = "/waterman";
+            }, 1000);
+          } 
+
+        });
+      }
     });
   }
   componentWillMount = () => {
@@ -89,6 +123,26 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        waterMerchant([
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              dataSource: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -128,7 +182,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -200,7 +254,7 @@ class journal extends React.Component {
             <div className="tit">
               水务商
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280,paddingTop:'10px'  }}>
               位置选择：<Cascader
                 defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
                 options={options}
@@ -223,7 +277,7 @@ class journal extends React.Component {
               <div style={{ marginTop: '10px' }}>
                 <Table
                   rowSelection={rowSelection}
-                  dataSource={this.state.data}
+                  dataSource={this.state.dataSource}
                   columns={columns}
                   rowClassName="editable-row"
                 />

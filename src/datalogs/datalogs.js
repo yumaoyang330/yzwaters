@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
 import { Link } from 'react-router-dom';
+import {devicelogs} from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './datalogs.css';
@@ -48,25 +49,20 @@ class journal extends React.Component {
       collapsed: false,
     };
     this.columns = [{
-      title: '用户类别',
-      dataIndex: 'deviceId',
-      editable: true,
+      title: '设备编号',
+      dataIndex: '设备编号',
     }, {
-      title: '用户名',
-      dataIndex: 'location',
-      editable: true,
+      title: '设备所属地区',
+      dataIndex: '设备所属地区',
     }, {
-      title: '用户详情',
-      dataIndex: 'status',
-      editable: true,
+      title: '设备负责人',
+      dataIndex: '设备负责人',
     }, {
       title: '日志内容',
-      dataIndex: 'siteName',
-      editable: true,
+      dataIndex: '日志内容',
     }, {
       title: '日志时间',
-      dataIndex: 'resPerson.name',
-      editable: true,
+      dataIndex: '日志时间',
     }];
   }
   toggle = () => {
@@ -84,6 +80,23 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        devicelogs([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })    
   }
   render() {
     const { selectedRowKeys } = this.state;

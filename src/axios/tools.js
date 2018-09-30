@@ -84,7 +84,7 @@ export default {
   put(url, params) {
     // const user = JSON.parse(localStorage.getItem('user')).token;
     return axios({
-      method: 'get',
+      method: 'put',
       // baseURL: 'https://cnodejs.org/api/v1',
       url,
       // params: { 'Authorization': user, ...params }, // get 请求时带的参数

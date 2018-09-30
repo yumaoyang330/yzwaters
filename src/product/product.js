@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, message } from 'antd';
-import { gets, site } from '../axios';
+import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Popconfirm, message } from 'antd';
+import { gets, product, productdelete,productdetail } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -17,28 +17,38 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
-      dataSource: '',
+      datas: '',
     };
+
     this.columns = [{
       title: '产品类别',
-      dataIndex: 'label',
+      dataIndex: 'model',
     }, {
       title: '产品名称',
-      dataIndex: '',
+      dataIndex: 'name',
     }, {
       title: '型号',
-      dataIndex: 'level',
+      dataIndex: 'serial',
     }, {
       title: '网络运营商',
-      dataIndex: 'id',
+      dataIndex: 'networkoperator',
     }, {
       title: '版本',
-      dataIndex: 'resPerson.name',
-      editable: true,
+      dataIndex: 'version',
     }, {
       title: '操作',
-      dataIndex: 'lastConnectTime',
-      editable: true,
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        return (
+          <div>
+            <span style={{ marginLeft: '10px' }}>
+              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
+                <a href="javascript:;">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        );
+      },
     },
     ];
   }
@@ -47,6 +57,55 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
+
+  onDelete = (text,key) => {
+    console.log(text)
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        productdelete([
+          text,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            message.success("信息删除成功");
+            const dataSource = [...this.state.datas];
+            this.setState({
+              num: this.state.num - 1,
+              dataSource: dataSource.filter(item => item.key !== key)
+            });
+            setTimeout(() => {
+              window.location.href = "/product";
+            }, 1000);
+          } 
+
+        });
+      }
+    });
+  }
+
+  equipmentquery = () => {
+    const productname = document.getElementById('productid').value;
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        product([
+          productname,
+          '',
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              datas: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+
+        });
+      }
+    });
+  }
+
   componentWillMount = () => {
     document.title = "产品信息列表";
     function showTime() {
@@ -59,23 +118,25 @@ class journal extends React.Component {
     setInterval(showTime, 1000);
 
 
-    gets().then(res => {
-      if (res.data && res.data.message === 'success') {
-        console.log(res.data.level)
-        this.setState({
-          dataSource: res.data.data,
-          num: res.data.data.length,
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        product([
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              datas: res.data.data,
+              num: res.data.data.length,
+            });
+          }
         });
-        localStorage.setItem('cascadedlocation', res.data.data);
-      } else if (res.data && res.data.status === 0) {
-        message.error("鉴权失败，需要用户重新登录");
-      } else if (res.data && res.data.status === 2) {
-        message.error("参数提取失败");
-      } else if (res.data && res.data.status === 3) {
-        message.error("服务器故障，请刷新再试");
       }
-    });
-
+    })
 
 
 
@@ -192,12 +253,12 @@ class journal extends React.Component {
             <div className="tit">
               产品信息
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-              产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} />
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, paddingTop: '10px' }}>
+              产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }}  id="productid"/>
               <div style={{ float: "right" }}>
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                 <Button>重置</Button>
-                <Button type="primary" style={{ marginLeft: '20px' }}><Link to="/offline">添加产品</Link></Button>
+                <Button type="primary" style={{ marginLeft: '20px' }}><Link to="/newadd">添加产品</Link></Button>
               </div>
               <div className="derive">
                 <Icon type="info-circle-o" />
@@ -210,7 +271,7 @@ class journal extends React.Component {
               <div style={{ marginTop: '10px' }}>
                 <Table
                   rowSelection={rowSelection}
-                  dataSource={this.state.dataSource}
+                  dataSource={this.state.datas}
                   columns={columns}
                   rowClassName="editable-row"
                 />

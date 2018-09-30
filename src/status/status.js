@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
 import { Link } from 'react-router-dom';
+import { collector, general, wireless, site } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './status.css';
@@ -9,38 +10,8 @@ const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
+
+
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -49,84 +20,179 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '信号强度',
-      dataIndex: 'deviceId',
+      dataIndex: 'signalIntensity',
     }, {
       title: '基站信息',
-      dataIndex: 'location',
+      dataIndex: 'baseStation',
     }, {
       title: '在线状态',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'deviceStatus',
     }, {
       title: '连网IP及端口',
-      dataIndex: 'status',
+      dataIndex: 'ipPort',
     }, {
       title: '挂表数',
-      dataIndex: 'siteName',
+      dataIndex: 'collectorNum',
     }, {
       title: '操作员',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'id',
+      render: (text, record, index) =>
+        <div>
+          <a onClick={() => this.showModal(record.key)}
+          >详情</a>
+          <Modal
+            title="联系方式"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+          >
+            <p>姓名:&nbsp;&nbsp;{this.state.name}</p>
+            <p>电话:&nbsp;&nbsp;{this.state.phone}</p>
+            <p>邮箱:&nbsp;&nbsp;{this.state.email}</p>
+          </Modal>
+        </div>
     }, {
       title: '上报间隔时间',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'signalIntensity',
     }];
 
     this.column = [{
       title: '信号强度',
-      dataIndex: 'deviceId',
+      dataIndex: 'signalIntensity',
     }, {
       title: '当前字轮',
-      dataIndex: 'location',
+      dataIndex: 'printWheel',
     }, {
       title: '阀门状态',
-      dataIndex: 'status',
+      dataIndex: 'valve',
     }, {
       title: '当前电压',
       dataIndex: 'siteName',
     }, {
       title: '最新读数',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'readingLatest',
     }, {
       title: '上线间隔(分钟)',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'reportingInterval',
     }, {
       title: '在线状态',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'onlineStatus',
     }, {
       title: '基站信息',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'baseStation',
     }, {
       title: '上报日期时间',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'reported_datetime',
     }, {
       title: '操作员',
       dataIndex: 'lastConnectTime',
+      render: (text, record, index) =>
+        <div>
+          <a onClick={() => this.showModaldb(record.key)}
+          >详情</a>
+          <Modal
+            title="联系方式"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+          >
+            <p>姓名:&nbsp;&nbsp;{this.state.name}</p>
+            <p>电话:&nbsp;&nbsp;{this.state.phone}</p>
+            <p>邮箱:&nbsp;&nbsp;{this.state.email}</p>
+          </Modal>
+        </div>
     }];
 
-    this.sbcolumn= [{
+    this.sbcolumn = [{
       title: '水表阀门状态',
-      dataIndex: 'deviceId',
+      dataIndex: 'valve',
     }, {
       title: '水表字轮',
-      dataIndex: 'location',
+      dataIndex: 'printWheel',
     }, {
       title: '水表所在通道号',
-      dataIndex: 'status',
+      dataIndex: 'chanelnum',
     }, {
       title: '设备生命周期',
       dataIndex: 'siteName',
     }, {
       title: '操作员',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'id',
+      render: (text, record, index) =>
+        <div>
+          <a onClick={() => this.showModalsb(record.key)}
+          >详情</a>
+          <Modal
+            title="联系方式"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+          >
+            <p>姓名:&nbsp;&nbsp;{this.state.name}</p>
+            <p>电话:&nbsp;&nbsp;{this.state.phone}</p>
+            <p>邮箱:&nbsp;&nbsp;{this.state.email}</p>
+          </Modal>
+        </div>
     }, {
       title: '设备安装时间',
-      dataIndex: 'lastConnectTime',
-    }];   
+      dataIndex: 'setupDatetime',
+    }];
 
   }
-  
+
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
+    });
+  }
+  showModal = (key) => {
+    for (var i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].key === key) {
+        this.setState({
+          visible: true,
+          name: this.state.data[i].operator,
+          phone: this.state.data[i].phone,
+          email: this.state.data[i].email,
+        });
+      }
+    }
+  }
+  showModaldb = (key) => {
+    for (var i = 0; i < this.state.dbdata.length; i++) {
+      if (this.state.dbdata[i].key === key) {
+        this.setState({
+          visible: true,
+          name: this.state.dbdata[i].operator,
+          phone: this.state.dbdata[i].phone,
+          email: this.state.dbdata[i].email,
+        });
+      }
+    }
+  }
+  showModalsb = (key) => {
+    for (var i = 0; i < this.state.ptdata.length; i++) {
+      if (this.state.ptdata[i].key === key) {
+        this.setState({
+          visible: true,
+          name: this.state.ptdata[i].operator,
+          phone: this.state.ptdata[i].phone,
+          email: this.state.ptdata[i].email,
+        });
+      }
+    }
+  }
+  handleOk = (e) => {
+    this.setState({
+      visible: false,
+    });
+  }
+  handleCancel = (e) => {
+    console.log(e);
+    this.setState({
+      visible: false,
     });
   }
   componentWillMount = () => {
@@ -139,8 +205,86 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        site([
+          1,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              area: res.data.data,
+            });
+          }
+        });
+      }
+    })
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        collector([
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          }
+        });
+      }
+    })
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        wireless([
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              dbdata: res.data.data,
+              num1: res.data.data.length,
+            });
+          }
+        });
+      }
+    })
+
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        general([
+          '',
+          '',
+          '',
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              ptdata: res.data.data,
+              num2: res.data.data.length,
+            });
+          }
+        });
+      }
+    })
+
+
+
+
   }
   render() {
+    const options = this.state.area;
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
@@ -209,7 +353,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -268,8 +412,8 @@ class journal extends React.Component {
                 </Button>
               </div>
               <span id="mytime" style={{ height: "100%", lineHeight: "64px", display: "inline-block", float: "left", borderRadius: '5px', color: '#333', marginLeft: '20px' }}></span>
-              <span style={{ float: 'right', height: '64px', lineHeight: "64px", marginRight: "2%",cursor: 'pointer' }} onClick={this.out}>
-              <Icon type="poweroff"  style={{marginRight:'10px'}}/>退出
+              <span style={{ float: 'right', height: '64px', lineHeight: "64px", marginRight: "2%", cursor: 'pointer' }} onClick={this.out}>
+                <Icon type="poweroff" style={{ marginRight: '10px' }} />退出
               </span>
               <div className="Administrator">
                 <span></span>{localStorage.getItem('realname')}超级管理员
@@ -281,13 +425,12 @@ class journal extends React.Component {
             <div className="tit">
               设备状态
             </div>
-            <Content style={{ margin: '24px 16px',background: '#fff', minHeight: 280 }}>
-            <div className="current">
+            <Content style={{ margin: '24px 16px', background: '#fff', minHeight: 280 }}>
+              <div className="current">
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
                     <TabPane tab="采集器" key="1" style={{ padding: '20px' }}>
                       位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
                         options={options}
                         onChange={this.onChange}
                         changeOnSelect style={{ marginLeft: '10px' }}
@@ -329,13 +472,13 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num1}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table
                           rowSelection={rowSelection}
-                          dataSource={this.state.dataSource}
+                          dataSource={this.state.dbdata}
                           columns={column}
                           rowClassName="editable-row"
                         />
@@ -357,13 +500,13 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num2}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table
                           rowSelection={rowSelection}
-                          dataSource={this.state.dataSource}
+                          dataSource={this.state.ptdata}
                           columns={sbcolumn}
                           rowClassName="editable-row"
                         />

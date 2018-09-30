@@ -204,7 +204,7 @@ class journal extends React.Component {
             <div className="tit">
               账户管理
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280,paddingTop:'10px'  }}>
               位置选择：<Cascader
                 defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
                 options={options}
