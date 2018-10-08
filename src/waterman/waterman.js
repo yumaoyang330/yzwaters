@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Popconfirm,message } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Popconfirm,message,Modal } from 'antd';
 import { waterMerchant,waterdelete} from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
@@ -62,7 +62,23 @@ class journal extends React.Component {
       dataIndex: '已安装设备数量',
     }, {
       title: '负责人信息',
-      dataIndex: 'linkman',
+      dataIndex: 'id',
+      render: (text, record, index) =>
+      <div>
+        <a onClick={() => this.showModal(text)}
+        >详情</a>
+        <Modal
+          title="联系方式"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          mask={false}
+        >
+          <p>姓名:&nbsp;&nbsp;{this.state.name}</p>
+          <p>电话:&nbsp;&nbsp;{this.state.phone}</p>
+          <p>邮箱:&nbsp;&nbsp;{this.state.email}</p>
+        </Modal>
+      </div>
     }, {
       title: '服务器信息',
       dataIndex: 'server',
@@ -88,7 +104,29 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
-
+  handleOk = (e) => {
+    this.setState({
+      visible: false,
+    });
+  }
+  handleCancel = (e) => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  }
+  showModal = (text) => {
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].id === text) {
+        this.setState({
+          visible: true,
+          name: this.state.dataSource[i].linkman,
+          phone: this.state.dataSource[i].phone,
+          email: this.state.dataSource[i].email,
+        });
+      }
+    }
+  }
 
   onDelete = (text,key) => {
     console.log(text)

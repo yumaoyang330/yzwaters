@@ -56,10 +56,6 @@ class journal extends React.Component {
       dataIndex: 'location',
       editable: true,
     }, {
-      title: '初始密码',
-      dataIndex: 'status',
-      editable: true,
-    }, {
       title: '联系方式',
       dataIndex: 'siteName',
       editable: true,

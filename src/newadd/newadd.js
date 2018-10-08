@@ -232,14 +232,6 @@ class newadd extends Component {
                     <div className='addinput'>
                       &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本批设备型号：<Input placeholder="美的净水器V2018" style={{ width: '60%' }} id="equipmenttype" />
                     </div>
-                    {/* <div className='addinput'>
-                      &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本批设备批件：
-                      <Upload {...props}>
-                        <Button>
-                          <Icon type="upload" /> 上传批件
-                        </Button>
-                      </Upload>
-                    </div> */}
                     <div className='addinput'>
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本批设备备注：<Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="content" />
                     </div>

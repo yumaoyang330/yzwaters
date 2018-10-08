@@ -115,7 +115,10 @@ export const waterdelete = (params) =>  http.post(url + '/waterMerchant/delete',
 
 
 //5.日志管理
-//5.1
+//5.1 数据日志管理
+export const datalogs = (params) =>  http.get(url + '/logging/data/view', {
+	id:params[0]
+});
 
 //5.2 设备日志管理
 export const devicelogs = (params) =>  http.get(url + '/logging/device/view', {

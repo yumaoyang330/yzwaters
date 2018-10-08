@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
 import { Link } from 'react-router-dom';
+import {datalogs} from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './journal.css';
@@ -49,30 +50,64 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '用户类别',
-      dataIndex: 'deviceId',
-      editable: true,
+      dataIndex: '用户类别',
     }, {
       title: '用户名',
-      dataIndex: 'location',
-      editable: true,
+      dataIndex: '用户名',
     }, {
       title: '用户详情',
-      dataIndex: 'status',
-      editable: true,
+      dataIndex: '',
+      render: (text, record, index) =>
+      <div>
+        <a onClick={() => this.showModal(record.key)}
+        >详情</a>
+        <Modal
+          title="联系方式"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          mask={false}
+        >
+          <p>姓名:&nbsp;&nbsp;{this.state.name}</p>
+          <p>电话:&nbsp;&nbsp;{this.state.phone}</p>
+          <p>邮箱:&nbsp;&nbsp;{this.state.email}</p>
+        </Modal>
+      </div>
     }, {
       title: '日志内容',
-      dataIndex: 'siteName',
-      editable: true,
+      dataIndex: '日志内容',
     }, {
       title: '日志时间',
-      dataIndex: 'resPerson.name',
-      editable: true,
+      dataIndex: '日志时间',
     }];
   }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
     });
+  }
+  handleOk = (e) => {
+    this.setState({
+      visible: false,
+    });
+  }
+  handleCancel = (e) => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  }
+  showModal = (key) => {
+    for (var i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].key === key) {
+        this.setState({
+          visible: true,
+          name: this.state.data[i].operator,
+          phone: this.state.data[i].phone,
+          email: this.state.data[i].email,
+        });
+      }
+    }
   }
   componentWillMount = () => {
     document.title = "数据日志";
@@ -84,6 +119,23 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        datalogs([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })   
+
   }
   render() {
     const { selectedRowKeys } = this.state;
