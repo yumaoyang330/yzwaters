@@ -140,7 +140,6 @@ class journal extends React.Component {
                 </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
-                  <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
                   <Menu.Item key="3"><Link to="/connector">接口信息</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>

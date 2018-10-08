@@ -7,7 +7,7 @@ import './newadd.css';
 
 
 var _val = ""
-
+var accounttype = ['无线单表', '采集器', '普通水表'];
 const TabPane = Tabs.TabPane;
 const fileList = [];
 function callback(key) {
@@ -134,6 +134,7 @@ class newadd extends Component {
     window.location.href = "/newadd";
   }
   render() {
+    const productname = accounttype.map(productnames => <Option key={productnames}>{productnames}</Option>);
     const { dataSource } = this.state;
     const columns = this.columns;
     return (
@@ -165,7 +166,6 @@ class newadd extends Component {
                 </Menu.Item>
                 <SubMenu key="sub1" title={<span><Icon type="file-text" /><span>信息查询</span></span>}>
                   <Menu.Item key="1"><Link to="/product">产品信息</Link></Menu.Item>
-                  <Menu.Item key="2"><Link to="/area">区域信息</Link></Menu.Item>
                   <Menu.Item key="3"><Link to="/connector">接口信息</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
@@ -230,50 +230,26 @@ class newadd extends Component {
                 <div className="curr">
                   <div className="current_text">
                     <div className='addinput'>
-                      &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本批设备型号：<Input placeholder="美的净水器V2018" style={{ width: '60%' }} id="equipmenttype" />
+                      <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品名称：</span>
+                      <Select defaultValue={accounttype[0]} onChange={this.usertype} style={{ width: '60%' }}>
+                        {productname}
+                      </Select>
                     </div>
                     <div className='addinput'>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本批设备备注：<Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="content" />
+                      <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品类别：</span>
+                      <Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="content" />
                     </div>
                     <div className='addinput'>
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;滤芯供应商：<Input placeholder="请输入滤芯供应商" style={{ width: '60%' }} id="filterprovider" />
+                      <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品型号：</span>
+                      <Input placeholder="请输入滤芯供应商" style={{ width: '60%' }} id="filterprovider" />
                     </div>
                     <div className='addinput'>
-                      &nbsp;&nbsp;&nbsp;滤芯维护服务商：<Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="filterMaintainer" />
+                      <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>网络运营商：</span>
+                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="filterMaintainer" />
                     </div>
-                    <div className='bjz'>
-                      <Row gutter={16}>
-                        <Col className="gutter-row" span={12}>
-                          <div className="gutter-box"  >
-                            流量预报警值:<Input placeholder="20" style={{ width: '50%', marginLeft: '10px' }} id="preAlertThreshold" addonAfter="t" />
-                          </div>
-                        </Col>
-                        <Col className="gutter-row" span={12}>
-                          <div className="gutter-box">
-                            流量报警值:<Input placeholder="25" style={{ width: '50%', marginLeft: '10px' }} id="alertThreshold" addonAfter="t" />
-                          </div>
-                        </Col>
-                        {/* <Col className="gutter-row" span={8}>
-                          <div className="gutter-box">
-                            电池电量报警值:<Input placeholder="3Ah" style={{ width: '40%', marginLeft: '10px' }} id="batteryThreshold" />
-                          </div>
-                        </Col> */}
-                      </Row>
-                    </div>
-                    <div className='number'>
-                      <Table dataSource={dataSource} columns={columns} pagination={false} />
-                      <span onClick={this.handleAdd} className="numadd" style={{ color: '#1890FF' }}>新增</span>
-                    </div>
-                    <div className="inform" >
-                      <p>报警通知:<span style={{ display: 'inline-block', width: '60px', textAlign: 'center' }}>{this.state.alertname}</span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.alertphone} </span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.alertorganization} </span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.alertemail} </span></p>
-                      <p>维修通知:<span style={{ display: 'inline-block', width: '60px', textAlign: 'center' }}>{this.state.repairname}</span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.repairphone} </span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.organization} </span>
-                        <span style={{ display: 'inline-block', paddingLeft: '10px', paddingRight: '10px' }}>{this.state.repairemail} </span>
-                      </p>
+                    <div className='addinput'>
+                      <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>版本：</span>
+                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="filterMaintainer" />
                     </div>
                     <div className="btn">
                       <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentsubmit}>提交</Button>
