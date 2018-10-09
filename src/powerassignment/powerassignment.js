@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input } from 'antd';
 import { Link } from 'react-router-dom';
+import { rolemenu } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './powerassignment.css';
@@ -67,6 +68,24 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        rolemenu([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          }
+        });
+      }
+    })
+
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -123,6 +142,7 @@ class journal extends React.Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Popconfirm, Select, Table, Input } from 'antd';
+import { accountview } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -9,38 +10,6 @@ const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-const options = [{
-  value: 'zhejiang',
-  label: '浙江',
-  children: [{
-    value: 'hangzhou',
-    label: '杭州',
-    children: [{
-      value: 'xihu',
-      label: '西湖区',
-      children: [{
-        value: "xuejun",
-        label: "学军中学"
-      }]
-    }, {
-      value: '上城区',
-      label: '上城区',
-      children: [{
-        value: '杭州十一中',
-        label: '杭州十一中',
-      }, {
-        value: '杭州市十中',
-        label: "杭州市十中"
-      }, {
-        value: '凤凰小学',
-        label: "凤凰小学"
-      }, {
-        value: '胜利小学',
-        label: "胜利小学"
-      }]
-    }],
-  }],
-}];
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -49,29 +18,39 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '账户类别',
-      dataIndex: 'deviceId',
+      dataIndex: '账户类别',
       editable: true,
     }, {
       title: '账户名',
-      dataIndex: 'location',
+      dataIndex: 'username',
       editable: true,
     }, {
       title: '联系方式',
-      dataIndex: 'siteName',
+      dataIndex: 'phone',
       editable: true,
     }, {
       title: '邮箱',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'email',
       editable: true,
     }, {
       title: '创建时间',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'gmtcreate',
       editable: true,
     }, {
       title: '操作',
-      dataIndex: 'lastConnectTime',
-      editable: true,
-    }
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        return (
+          <div>
+            <span style={{ marginLeft: '10px' }}>
+              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
+                <a href="javascript:;">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        );
+      },
+    },
     ];
   }
   toggle = () => {
@@ -79,6 +58,32 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
+
+  // onDelete = (text,key) => {
+  //   console.log(text)
+  //   this.props.form.validateFields({ force: true }, (error) => {
+  //     if (!error) {
+  //       productdelete([
+  //         text,
+  //       ]).then(res => {
+  //         if (res.data && res.data.message === 'success') {
+  //           message.success("信息删除成功");
+  //           const dataSource = [...this.state.data];
+  //           this.setState({
+  //             num: this.state.num - 1,
+  //             dataSource: dataSource.filter(item => item.key !== key)
+  //           });
+  //           setTimeout(() => {
+  //             window.location.href = "/account";
+  //           }, 1000);
+  //         } 
+
+  //       });
+  //     }
+  //   });
+  // }
+
+
   componentWillMount = () => {
     document.title = "账户管理";
     function showTime() {
@@ -89,6 +94,23 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        accountview([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -128,7 +150,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                 <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -145,6 +167,7 @@ class journal extends React.Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -186,26 +209,21 @@ class journal extends React.Component {
                 </Button>
               </div>
               <span id="mytime" style={{ height: "100%", lineHeight: "64px", display: "inline-block", float: "left", borderRadius: '5px', color: '#333', marginLeft: '20px' }}></span>
-              <span style={{ float: 'right', height: '64px', lineHeight: "64px", marginRight: "2%",cursor: 'pointer' }} onClick={this.out}>
-              <Icon type="poweroff"  style={{marginRight:'10px'}}/>退出
+              <span style={{ float: 'right', height: '64px', lineHeight: "64px", marginRight: "2%", cursor: 'pointer' }} onClick={this.out}>
+                <Icon type="poweroff" style={{ marginRight: '10px' }} />退出
               </span>
               <div className="Administrator">
                 <span></span>{localStorage.getItem('realname')}超级管理员
             </div>
             </Header>
             <div className="nav">
-            用户管理 / 账户管理
+              用户管理 / 账户管理
             </div>
             <div className="tit">
               账户管理
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280,paddingTop:'10px'  }}>
-              位置选择：<Cascader
-                defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                options={options}
-                onChange={this.onChange}
-                changeOnSelect style={{ marginLeft: '10px' }}
-              />
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, paddingTop: '10px' }}>
+              账户类别:<Input placeholder="请输入账户类别" style={{ width: '20%', marginLeft: '10px' }} id="accounttype" />
               <div style={{ float: "right" }}>
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                 <Button>重置</Button>

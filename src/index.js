@@ -6,13 +6,11 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import product from './product/product';
-import area from './area/area';
 import journal from './journal/journal';
 import lifecycle from './lifecycle/lifecycle';
 import connector from './connector/connector';
 import basic from './basic/basic';
 import status from './status/status';
-import parameter from './parameter/parameter';
 import waterman from './waterman/waterman';
 import account from './account/account';
 import history from './history/history';
@@ -33,6 +31,7 @@ import roleassignment from './roleassignment/roleassignment';
 import power from './power/power';
 import powerassignment from './powerassignment/powerassignment';
 import newadd from './newadd/newadd';
+import parameter from './parameter/parameter';
 
 ReactDOM.render(
   <Router >
@@ -46,7 +45,6 @@ ReactDOM.render(
       {/* <Route path="/information"> */}
         <Route path='/product' component={product} />
         <Route path='/newadd' component={newadd} />
-        <Route path='/area' component={area} />
         <Route path='/journal' component={journal} />
         <Route path='/datalogs' component={datalogs} />
         <Route path='/userlogs' component={userlogs} />

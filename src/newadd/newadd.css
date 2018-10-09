@@ -12,6 +12,9 @@
     display: flex;
     align-items: center;
 }
+#mytime{
+    font-size: 16px;
+}
 #newaddbody .Administrator{
     float: right;
     height: 64px;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Input } from 'antd';
 import { Link } from 'react-router-dom';
+import { getLifecycle } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './lifecycle.css';
@@ -50,78 +51,162 @@ class journal extends React.Component {
     this.columns = [{
       title: '产品种类',
       dataIndex: 'deviceId',
-      editable: true,
+      render: (text, record, index) =>
+        <div>
+          无线单表
+      </div>
     }, {
       title: '设备编号',
-      dataIndex: 'location',
+      dataIndex: 'device_num',
       editable: true,
     }, {
+      title: '设备状态',
+      dataIndex: '设备状态',
+      render: (text) => {
+        if (text === 1) {
+          return (
+            <div>
+              <span style={{ color: 'green' }}>正常</span>
+            </div>
+          )
+        }
+        if (text === 2) {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>异常</span>
+            </div>
+          )
+        }
+        if (text === 3) {
+          return (
+            <div>
+              <span style={{ color: 'purple' }}>被替换</span>
+            </div>
+          )
+        }
+      }
+    }, {
       title: '生产日期',
-      dataIndex: 'status',
+      dataIndex: '生产时间',
       editable: true,
     }, {
       title: '入库日期',
-      dataIndex: 'siteName',
+      dataIndex: '入库时间',
       editable: true,
     }, {
       title: '出库日期',
-      dataIndex: 'resPerson.name',
+      dataIndex: '出库时间',
       editable: true,
     }, {
       title: '安装时间',
-      dataIndex: 'resPerson.name',
+      dataIndex: '安装时间',
       editable: true,
     }];
 
     this.column = [{
       title: '产品种类',
-      dataIndex: 'deviceId',
-      editable: true,
+      dataIndex: '',
+      render: (text, record, index) =>
+        <div>
+          采集器
+      </div>
     }, {
       title: '设备编号',
-      dataIndex: 'location',
+      dataIndex: 'device_num',
       editable: true,
     }, {
       title: '设备状态',
-      dataIndex: 'status',
+      dataIndex: '设备状态',
+      render: (text) => {
+        if (text === 1) {
+          return (
+            <div>
+              <span style={{ color: 'green' }}>正常</span>
+            </div>
+          )
+        }
+        if (text === 2) {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>异常</span>
+            </div>
+          )
+        }
+        if (text === 3) {
+          return (
+            <div>
+              <span style={{ color: 'purple' }}>被替换</span>
+            </div>
+          )
+        }
+      }
+    }, {
+      title: '生产日期',
+      dataIndex: '生产时间',
       editable: true,
     }, {
-      title: '操作员信息',
-      dataIndex: 'siteName',
+      title: '入库日期',
+      dataIndex: '入库时间',
       editable: true,
     }, {
-      title: '操作时间',
-      dataIndex: 'resPerson.name',
+      title: '出库日期',
+      dataIndex: '出库时间',
       editable: true,
     }, {
-      title: '备注信息',
-      dataIndex: 'resPerson.name',
+      title: '安装时间',
+      dataIndex: '安装时间',
       editable: true,
     }];
 
     this.ptcolumn = [{
       title: '产品种类',
       dataIndex: 'deviceId',
-      editable: true,
+      render: (text) => {
+        if (text === 1) {
+          return (
+            <div>
+              <span style={{ color: 'green' }}>正常</span>
+            </div>
+          )
+        }
+        if (text === 2) {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>异常</span>
+            </div>
+          )
+        }
+        if (text === 3) {
+          return (
+            <div>
+              <span style={{ color: 'purple' }}>被替换</span>
+            </div>
+          )
+        }
+      }
     }, {
       title: '设备编号',
-      dataIndex: 'location',
+      dataIndex: 'device_num',
       editable: true,
     }, {
       title: '设备状态',
-      dataIndex: 'status',
+      dataIndex: '设备状态',
       editable: true,
     }, {
-      title: '操作员信息',
-      dataIndex: 'siteName',
+      title: '生产日期',
+      dataIndex: '生产时间',
       editable: true,
     }, {
-      title: '操作时间',
-      dataIndex: 'resPerson.name',
+      title: '入库日期',
+      dataIndex: '入库时间',
       editable: true,
     }, {
-      title: '备注信息',
-      dataIndex: 'resPerson.name',
+      title: '出库日期',
+      dataIndex: '出库时间',
+      editable: true,
+    }, {
+      title: '安装时间',
+      dataIndex: '安装时间',
       editable: true,
     }];
 
@@ -144,6 +229,50 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        getLifecycle([
+          1
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          }
+        });
+
+
+        getLifecycle([
+          2
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              dataSource: res.data.data,
+              num1: res.data.data.length,
+            });
+          }
+        });
+
+        getLifecycle([
+          3
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              dataSources: res.data.data,
+              num2: res.data.data.length,
+            });
+          }
+        });
+
+      }
+    })
+
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -229,6 +358,7 @@ class journal extends React.Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -288,12 +418,7 @@ class journal extends React.Component {
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
                     <TabPane tab="无线单表" key="1" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                      设备编号:<Input placeholder="请输入无线单表编号" style={{ width: '20%', marginLeft: '10px' }} id="dbnum" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -303,8 +428,8 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
-                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
+                          列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
+                          <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table
@@ -316,12 +441,7 @@ class journal extends React.Component {
                       </div>
                     </TabPane>
                     <TabPane tab="采集器" key="2" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                      设备编号:<Input placeholder="请输入采集器编号" style={{ width: '20%', marginLeft: '10px' }} id="cjqnum" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -331,8 +451,8 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
-                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
+                           列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num1}</span> 条
+                          <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table
@@ -345,12 +465,7 @@ class journal extends React.Component {
                     </TabPane>
 
                     <TabPane tab="普通水表" key="3" style={{ padding: '20px' }}>
-                      位置选择：<Cascader
-                        defaultValue={['zhejiang', 'hangzhou', 'xihu', 'xuejun']}
-                        options={options}
-                        onChange={this.onChange}
-                        changeOnSelect style={{ marginLeft: '10px' }}
-                      />
+                      设备编号:<Input placeholder="请输入普通水表编号" style={{ width: '20%', marginLeft: '10px' }} id="sbnum" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -360,8 +475,8 @@ class journal extends React.Component {
                         &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
                           {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
                         </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
-                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
+                          列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num2}</span> 条
+                          <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
                       </div>
                       <div style={{ marginTop: '10px' }}>
                         <Table

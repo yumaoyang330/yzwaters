@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input,Popconfirm,message } from 'antd';
 import { Link } from 'react-router-dom';
+import { rolelist,roleadd } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './role.css';
@@ -18,13 +19,27 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '角色名称',
-      dataIndex: 'deviceId',
+      dataIndex: 'name',
     }, {
-      title: '角色类型',
-      dataIndex: 'location',
+      title: '角色简写',
+      dataIndex: 'value',
+    },{
+      title: '角色创建时间',
+      dataIndex: 'createTime',
     }, {
       title: '操作',
-      dataIndex: 'status',
+      dataIndex: 'id',
+      render: (text) => {
+        return (
+          <div>
+            <span style={{ marginLeft: '10px' }}>
+              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
+                <a href="javascript:;">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        );
+      },
     }
     ];
   }
@@ -43,9 +58,24 @@ class journal extends React.Component {
 
   handleOk = (e) => {
     console.log(e);
-    this.setState({
-      visible: false,
-    });
+    let rolename = document.getElementById('rolename').value;
+    let roleabbr = document.getElementById('roleabbr').value;
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        roleadd([
+          rolename,
+          roleabbr,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            message.success("设备添加成功");
+            window.location.href = "/role";
+          } 
+        });
+      }
+      })
+      this.setState({
+        visible: false,
+      });
   }
 
   handleCancel = (e) => {
@@ -64,6 +94,24 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        rolelist([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })
+
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -120,6 +168,7 @@ class journal extends React.Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -188,8 +237,8 @@ class journal extends React.Component {
                   onCancel={this.handleCancel}
                   okText="Save"
                 >
-                  角色名称：<Input placeholder="请输入角色名称" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} />
-                  角色类型：<Input placeholder="请输入角色类型  [字母 + 数字] 6位" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} />
+                  角色名称：<Input placeholder="请输入角色名称" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }}  id="rolename"/>
+                  角色简写：<Input placeholder="请输入角色名称英文简写" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} id="roleabbr" />
                 </Modal>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/roleassignment">角色分配</Link></Button>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/power">权限列表</Link></Button>

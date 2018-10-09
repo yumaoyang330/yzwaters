@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Icon, Button, Select, Table, Menu, Input, Layout, Row, Col, Popconfirm, Tabs, Cascader, message, Upload } from 'antd';
 import { Link } from 'react-router-dom';
 import { createForm } from 'rc-form';
-import { equipmentadd, getrespersoninfo, gets } from '../axios';
+import { productadd } from '../axios';
 import './newadd.css';
 
 
@@ -16,20 +16,10 @@ function callback(key) {
 const dataSource = [];
 for (let i = 0; i < 1; i++) {
   dataSource.push({
-    province: '',
-    city: '',
-    county: '',
-    school: '',
-    location: '',
     type: '',
-    content: '',
-    alertThreshold: '',
-    batteryThreshold: '',
-    simId: '',
-    key: i,
-    deviceId: '',
-    location: '',
-    initFlow: '',
+    model: '',
+    networkoperator: '',
+    version: '',
   });
 }
 const { Header, Sider, Content } = Layout;
@@ -39,52 +29,6 @@ const Option = Select.Option;
 class newadd extends Component {
   constructor(props) {
     super(props);
-    this.columns = [{
-      width: '30%',
-      dataIndex: 'deviceId',
-      render: (text, record) => {
-        return (
-          <div className="gutter-box" style={{ fontSize: '16px' }}>
-            设备编号:<Input type="text" className="deviceId" placeholder="请输入设备编号" style={{ width: '60%', marginLeft: '10px' }} />
-          </div>
-        );
-      },
-    }, {
-      dataIndex: 'location',
-      width: '30%',
-      render: (text, record) => {
-        return (
-          <div className="gutter-box" style={{ fontSize: '16px' }}>
-            安装地址:<Input placeholder="安装地址" style={{ width: '60%', marginLeft: '10px' }} className="locations" />
-          </div>
-        );
-      },
-    }, {
-      dataIndex: 'flow',
-      width: '20%',
-      render: (text, record) => {
-        return (
-          <div className="gutter-box" style={{ fontSize: '16px' }}>
-            初始流量:<Input placeholder="0" style={{ width: '40%', marginLeft: '10px' }} className="initFlow" />
-          </div>
-        );
-      },
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      width: '20%',
-      align: 'right',
-      render: (text, record) => {
-        return (
-          dataSource.length > 1 ?
-            (
-              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(record.key)}>
-                <a href="javascript:;">删除</a>
-              </Popconfirm>
-            ) : null
-        );
-      },
-    }];
     this.state = {
       num: 15,
       collapsed: false,
@@ -114,7 +58,7 @@ class newadd extends Component {
       let year = nowtime.getFullYear();
       let month = nowtime.getMonth() + 1;
       let date = nowtime.getDate();
-      document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
+      document.getElementById("mytime").innerText = year + "年" + month + "月" + date + "" + nowtime.toLocaleTimeString();
     }
 
     setInterval(showTime, 1000);
@@ -133,10 +77,36 @@ class newadd extends Component {
   reset = () => {
     window.location.href = "/newadd";
   }
+
+
+
+  equipmentsubmit = () => {
+    let type = document.getElementById('type').value;
+    let model = document.getElementById('model').value;
+    let networkoperator = document.getElementById('networkoperator').value;
+    let version = document.getElementById('version').value;
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      this.state.dataSource[i].type = type;
+      this.state.dataSource[i].model = model;
+      this.state.dataSource[i].networkoperator = networkoperator;
+      this.state.dataSource[i].version = version;
+    }
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        productadd(
+          JSON.stringify(dataSource)
+        ).then(res => {
+          if (res.data && res.data.status === 1) {
+            message.success("设备添加成功");
+            window.location.href = "/management";
+          }
+        });
+      }
+    });
+
+  }
   render() {
     const productname = accounttype.map(productnames => <Option key={productnames}>{productnames}</Option>);
-    const { dataSource } = this.state;
-    const columns = this.columns;
     return (
       <div id="newaddbody" >
         <Layout>
@@ -171,6 +141,7 @@ class newadd extends Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -237,19 +208,19 @@ class newadd extends Component {
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品类别：</span>
-                      <Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="content" />
+                      <Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="type" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品型号：</span>
-                      <Input placeholder="请输入滤芯供应商" style={{ width: '60%' }} id="filterprovider" />
+                      <Input placeholder="请输入滤芯供应商" style={{ width: '60%' }} id="model" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>网络运营商：</span>
-                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="filterMaintainer" />
+                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="networkoperator" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>版本：</span>
-                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="filterMaintainer" />
+                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="version" />
                     </div>
                     <div className="btn">
                       <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentsubmit}>提交</Button>

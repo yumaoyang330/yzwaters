@@ -47,6 +47,8 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
+      keylist: "",
+      selectedRowKeys: [],
     };
     this.columns = [{
       title: '水务商名称',
@@ -82,20 +84,6 @@ class journal extends React.Component {
     }, {
       title: '服务器信息',
       dataIndex: 'server',
-    }, {
-      title: '操作',
-      dataIndex: 'id',
-      render: (text, record, index) => {
-        return (
-          <div>
-            <span style={{ marginLeft: '10px' }}>
-              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
-                <a href="javascript:;">删除</a>
-              </Popconfirm>
-            </span>
-          </div>
-        );
-      },
     },
     ];
   }
@@ -127,28 +115,12 @@ class journal extends React.Component {
       }
     }
   }
-
-  onDelete = (text,key) => {
-    console.log(text)
-    this.props.form.validateFields({ force: true }, (error) => {
-      if (!error) {
-        waterdelete([
-          text,
-        ]).then(res => {
-          if (res.data && res.data.message === 'success') {
-            message.success("信息删除成功");
-            const dataSource = [...this.state.dataSource];
-            this.setState({
-              num: this.state.num - 1,
-              dataSource: dataSource.filter(item => item.key !== key)
-            });
-            setTimeout(() => {
-              window.location.href = "/waterman";
-            }, 1000);
-          } 
-
-        });
-      }
+  onSelectChange = (selectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    console.log(selectedRowKeys.length)
+    this.setState({
+      selectedRowKeys,
+      keylist: selectedRowKeys,
     });
   }
   componentWillMount = () => {
@@ -236,7 +208,9 @@ class journal extends React.Component {
                 </SubMenu>
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
+
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -306,7 +280,7 @@ class journal extends React.Component {
               <div className="derive">
                 <Icon type="info-circle-o" />
                 &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
-                  {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
+                  {hasSelected ? `${selectedRowKeys.length}` : ''}
                 </span>条记录
                 列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>

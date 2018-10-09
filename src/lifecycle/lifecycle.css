@@ -17,6 +17,9 @@
     padding: 7px;
     font-size: 15px;   
 }
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+    padding: 10px 10px !important;
+}
 .homepages{
     height: 50px;
     background: #00284D;

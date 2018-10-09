@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input, Popconfirm,Checkbox  } from 'antd';
 import { Link } from 'react-router-dom';
+import { userrole } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './roleassignment.css';
 
+
+const CheckboxGroup = Checkbox.Group;
+const plainOptions = ['Apple', 'Pear', 'Orange'];
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
@@ -18,19 +22,40 @@ class journal extends React.Component {
     };
     this.columns = [{
       title: '角色昵称',
-      dataIndex: 'deviceId',
+      dataIndex: 'name',
     }, {
       title: 'Email/帐号',
-      dataIndex: 'location',
+      dataIndex: 'email',
     }, {
       title: '状态',
-      dataIndex: 'location',
+      dataIndex: 'status',
     }, {
       title: '拥有的角色',
-      dataIndex: 'location',
+      dataIndex: 'roles[0].name',
     }, {
       title: '操作',
       dataIndex: 'status',
+      render: (text) => {
+        return (
+          <div>
+            <span onClick={this.showModal} style={{ color: 'blue', cursor: 'pointer' }}>
+              选择角色
+            </span>
+            <span style={{ marginLeft: '10px' }}>
+              <Modal
+                title="添加角色"
+                visible={this.state.visible}
+                onOk={this.handleOk}
+                onCancel={this.handleCancel}
+                okText="Save"
+                mask={false}
+              >
+                <CheckboxGroup options={plainOptions} value={this.state.checkedList} onChange={this.onChange} />
+              </Modal>
+            </span>
+          </div>
+        );
+      },
     }
     ];
   }
@@ -54,6 +79,15 @@ class journal extends React.Component {
     });
   }
 
+  onChange = (checkedList) => {
+    console.log(checkedList)
+    this.setState({
+      checkedList,
+      indeterminate: !!checkedList.length && (checkedList.length < plainOptions.length),
+      checkAll: checkedList.length === plainOptions.length,
+    });
+  }
+
   handleCancel = (e) => {
     console.log(e);
     this.setState({
@@ -70,6 +104,23 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        userrole([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          }
+        });
+      }
+    })
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -93,7 +144,7 @@ class journal extends React.Component {
       };
     });
     return (
-      <div id="accountbody" >
+      <div id="rolebody" >
         <Layout>
           <Sider
             trigger={null}
@@ -109,7 +160,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -126,6 +177,7 @@ class journal extends React.Component {
                 <SubMenu key="sub2" title={<span><Icon type="desktop" /><span>设备管理</span></span>}>
                   <Menu.Item key="4"><Link to="/basic">基本信息</Link></Menu.Item>
                   <Menu.Item key="5"><Link to="/status">设备状态</Link></Menu.Item>
+                  <Menu.Item key="2"><Link to="/parameter">参数设置</Link></Menu.Item>
                 </SubMenu>
                 <SubMenu key="sub3" title={<span><Icon type="user" /><span>用户管理</span></span>}>
                   <Menu.Item key="6"><Link to="/waterman">水务商</Link></Menu.Item>
@@ -184,19 +236,11 @@ class journal extends React.Component {
               <div >
                 用户名称：<Input placeholder="输入用户昵称 / 用户帐号" style={{ width: '20%', marginLeft: '10px', marginRight: '40px' }} />
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
-                <Button type="primary" onClick={this.showModal} style={{ marginLeft: '20px', color: 'white', backgroundColor: '#d9534f', borderColor: '#d9534f', }}>
-                  清空用户角色
+                <Popconfirm title="确定要清空吗?" onConfirm={() => this.onDelete()}>
+                  <Button type="primary" style={{ marginLeft: '20px', color: 'white', backgroundColor: '#d9534f', borderColor: '#d9534f', }}>
+                    清空用户角色
                 </Button>
-                <Modal
-                  title="添加角色"
-                  visible={this.state.visible}
-                  onOk={this.handleOk}
-                  onCancel={this.handleCancel}
-                  okText="Save"
-                >
-                  角色名称：<Input placeholder="请输入角色名称" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} />
-                  角色类型：<Input placeholder="请输入角色类型  [字母 + 数字] 6位" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} />
-                </Modal>
+                </Popconfirm>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/role">角色列表</Link></Button>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/power">权限列表</Link></Button>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/powerassignment">权限分配</Link></Button>
