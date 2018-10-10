@@ -35,6 +35,7 @@ class newadd extends Component {
       size: 'small',
       selectedRowKeys: [],
       dataSource: dataSource,
+      usertype: accounttype[0],
       count: 2,
       province: '',
       city: '',
@@ -58,12 +59,16 @@ class newadd extends Component {
       let year = nowtime.getFullYear();
       let month = nowtime.getMonth() + 1;
       let date = nowtime.getDate();
-      document.getElementById("mytime").innerText = year + "年" + month + "月" + date + "" + nowtime.toLocaleTimeString();
+      document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
-
     setInterval(showTime, 1000);
   }
-
+  usertype = (value) => {
+    console.log(value)
+    this.setState({
+      usertype: value,
+    });
+  }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
@@ -86,6 +91,7 @@ class newadd extends Component {
     let networkoperator = document.getElementById('networkoperator').value;
     let version = document.getElementById('version').value;
     for (var i = 0; i < this.state.dataSource.length; i++) {
+      this.state.dataSource[i].usertype = this.state.usertype
       this.state.dataSource[i].type = type;
       this.state.dataSource[i].model = model;
       this.state.dataSource[i].networkoperator = networkoperator;
@@ -96,7 +102,7 @@ class newadd extends Component {
         productadd(
           JSON.stringify(dataSource)
         ).then(res => {
-          if (res.data && res.data.status === 1) {
+          if (res.data && res.data.status === 'success') {
             message.success("设备添加成功");
             window.location.href = "/management";
           }

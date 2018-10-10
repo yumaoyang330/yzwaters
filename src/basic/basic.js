@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal,message } from 'antd';
-import { wirelessbasic,generalbasic,collectorbasic } from '../axios';
+import { wirelessbasic,generalbasic,collectorbasic ,getLifecycleDetail} from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -59,7 +59,7 @@ class journal extends React.Component {
       dataIndex: '起始读数',
     }, {
       title: '设备生命周期',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'id',
       render: (text, record, index) =>
       <div>
         <a onClick={() => this.showModal(record.key)}

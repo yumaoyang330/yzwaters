@@ -7,10 +7,11 @@ const url='http://192.168.31.180:9090';
 
 
 //1.1登录界面
-export const login = (params) => myapi(url + '/login', {
+export const login = (params) => http.post(url + '/auth/oauth/token', {
 	username: params[0],
 	password: params[1],
 });
+
 
 
 //2.1 产品信息
@@ -55,6 +56,11 @@ export const collector = (params) => http.get(url + '/device/state/collector', {
 	districtSite:params[3],
 });
 
+//3.1.1 获取产品生命周期
+export const getLifecycleDetail = (params) => http.get(url + '/lifecycle/basic/getLifecycleDetail', {
+	deviceNum: params[0],
+	type:params[1],
+});
 
 //3.2 普通水表设备状态
 export const general = (params) => http.get(url + '/device/state/general', {

@@ -78,7 +78,7 @@ class journal extends React.Component {
             console.log(res.data.data)
             this.setState({
               data: res.data.data,
-              num: res.data.data.length,
+              // num: res.data.data.length,
             });
           }
         });

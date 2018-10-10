@@ -50,6 +50,9 @@ export default {
       // baseURL: 'https://cnodejs.org/api/v1',
       url,
       data: qs.stringify(data),
+      // headers:{
+      //   'Content-Type':'application/json',
+      // },
       timeout: 10000,
     }).then(
       (response) => {
