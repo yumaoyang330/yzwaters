@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal,message } from 'antd';
-import { wirelessbasic,generalbasic,collectorbasic ,getLifecycleDetail} from '../axios';
+import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal, message } from 'antd';
+import { wirelessbasic, generalbasic, collectorbasic, getLifecycleDetail, getHistoryReading } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -15,6 +15,46 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
+      tabnum: 1,
+      lifereport: [{
+        title: '设备编号',
+        dataIndex: 'deviceNum',
+      }, {
+        title: '生命周期',
+        dataIndex: 'status',
+      }, {
+        title: '操作时间',
+        dataIndex: 'date',
+      }, {
+        title: '操作员',
+        dataIndex: 'userId',
+      }],
+
+      dbreports: [{
+        title: '设备编号',
+        dataIndex: 'deviceNum',
+      }, {
+        title: '生命周期',
+        dataIndex: 'status',
+      }, {
+        title: '操作时间',
+        dataIndex: 'date',
+      }, {
+        title: '操作员',
+        dataIndex: 'userId',
+      }],
+
+
+      readouts: [{
+        title: '设备编号',
+        dataIndex: 'deviceNum',
+      }, {
+        title: '时间',
+        dataIndex: 'date',
+      }, {
+        title: '读数',
+        dataIndex: 'reading',
+      }],
     };
 
     this.column = [{
@@ -22,26 +62,26 @@ class journal extends React.Component {
       dataIndex: '发货单位',
     }, {
       title: '历史读数',
-      dataIndex: 'location',
+      dataIndex: 'id',
       render: (text, record, index) =>
-      <div>
-        <a onClick={() => this.showModal(record.key)}
-        >详情</a>
-        <Modal
-          title="联系方式"
-          // maskStyle={{ background: "black", opacity: '0.1' }}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          mask={false}
-        >
-          <p>姓名:{this.state.name}</p>
-          <p>电话:{this.state.phone}</p>
-          <p>邮箱:{this.state.email}</p>
-          <p>地址:{this.state.organization}</p>
-          <p>备注:{this.state.content}</p>
-        </Modal>
-      </div>
+        <div>
+          <a onClick={() => this.showhistory(text)}
+          >详情</a>
+          <Modal
+            title="历史读数"
+            // maskStyle={{ background: "black", opacity: '0.1' }}
+            visible={this.state.historyvisible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+          >
+            <Table
+              dataSource={this.state.readout}
+              columns={this.state.readouts}
+              rowClassName="editable-row"
+            />
+          </Modal>
+        </div>
     }, {
       title: '水表编号',
       dataIndex: 'district_id',
@@ -61,49 +101,50 @@ class journal extends React.Component {
       title: '设备生命周期',
       dataIndex: 'id',
       render: (text, record, index) =>
-      <div>
-        <a onClick={() => this.showModal(record.key)}
-        >详情</a>
-        <Modal
-          title="联系方式"
-          // maskStyle={{ background: "black", opacity: '0.1' }}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          mask={false}
-        >
-          <p>姓名:{this.state.name}</p>
-          <p>电话:{this.state.phone}</p>
-          <p>邮箱:{this.state.email}</p>
-          <p>地址:{this.state.organization}</p>
-          <p>备注:{this.state.content}</p>
-        </Modal>
-      </div>
+        <div>
+          <a onClick={() => this.dblifeshowModal(text)} style={{ marginRight: '10px' }}
+          >详情</a>
+          <Modal
+            title="生命周期"
+            visible={this.state.dblookshow}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+            okText="确认"
+            cancelText="取消"
+          >
+            <Table
+              dataSource={this.state.reports}
+              columns={this.state.dbreports}
+              rowClassName="editable-row"
+            />
+
+          </Modal>
+        </div>
     }, {
       title: '设备安装时间',
       dataIndex: '设备安装时间',
     }, {
       title: '详情',
-      dataIndex: 'resPerson.name',
+      dataIndex: 'id',
       render: (text, record, index) =>
-      <div>
-        <a onClick={() => this.showModal(record.key)}
-        >详情</a>
-        <Modal
-          title="联系方式"
-          // maskStyle={{ background: "black", opacity: '0.1' }}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          mask={false}
-        >
-          <p>姓名:{this.state.name}</p>
-          <p>电话:{this.state.phone}</p>
-          <p>邮箱:{this.state.email}</p>
-          <p>地址:{this.state.organization}</p>
-          <p>备注:{this.state.content}</p>
-        </Modal>
-      </div>
+        <div>
+          <a onClick={() => this.showModal(text)}
+          >详情</a>
+          <Modal
+            title="联系方式"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+          >
+            <p>姓名:{this.state.name}</p>
+            <p>电话:{this.state.phone}</p>
+            <p>邮箱:{this.state.email}</p>
+            <p>地址:{this.state.organization}</p>
+            <p>备注:{this.state.content}</p>
+          </Modal>
+        </div>
     }];
 
     this.sbcolumn = [{
@@ -122,7 +163,7 @@ class journal extends React.Component {
       title: '所属发货单号',
       dataIndex: '所属发货单号',
     }];
-  
+
 
     this.columns = [{
       title: 'IMEI',
@@ -152,43 +193,158 @@ class journal extends React.Component {
     },
     {
       title: '设备生命周期',
-      dataIndex: 'lastConnectTime',
+      dataIndex: 'id',
       render: (text, record, index) =>
-      <div>
-        <a onClick={() => this.showModal(record.key)}
-        >详情</a>
-        <Modal
-          title="联系方式"
-          // maskStyle={{ background: "black", opacity: '0.1' }}
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          mask={false}
-        >
-          <p>姓名:{this.state.name}</p>
-          <p>电话:{this.state.phone}</p>
-          <p>邮箱:{this.state.email}</p>
-          <p>地址:{this.state.organization}</p>
-          <p>备注:{this.state.content}</p>
-        </Modal>
-      </div>
+        <div>
+          <a onClick={() => this.lifeshowModal(text)} style={{ marginRight: '10px' }}
+          >详情</a>
+          <Modal
+            title="生命周期"
+            visible={this.state.lookshow}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            mask={false}
+            okText="确认"
+            cancelText="取消"
+          >
+            <Table
+              dataSource={this.state.report}
+              columns={this.state.lifereport}
+              rowClassName="editable-row"
+            />
+
+          </Modal>
+        </div>
     },
     {
       title: '设备安装时间',
       dataIndex: '设备安装时间',
-    },  {
+    }, {
       title: '所属发货单号',
       dataIndex: '所属发货单号',
     },
     ];
   }
 
-  
+
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
     });
   }
+  handleOk = (e) => {
+    this.setState({
+      visible: false,
+      lookshow: false,
+      dblookshow: false,
+      historyvisible: false,
+    });
+  }
+
+  handleCancel = (e) => {
+    console.log(e);
+    this.setState({
+      visible: false,
+      lookshow: false,
+      dblookshow: false,
+      historyvisible: false,
+    });
+  }
+  tabchange = (e) => {
+    this.setState({
+      tabnum: e,
+    });
+  }
+  state = { visible: false }
+  showModal = (text) => {
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].id === text) {
+        this.setState({
+          visible: true,
+          // phone: this.state.dataSource[i].resPerson.phone,
+          // name: this.state.dataSource[i].resPerson.name,
+          // email: this.state.dataSource[i].resPerson.email,
+          // organization: this.state.dataSource[i].resPerson.organization,
+          // content: this.state.dataSource[i].resPerson.content,
+        });
+      }
+    }
+  }
+  state = { lookshow: false }
+  lifeshowModal = (text) => {
+    getLifecycleDetail([
+      123,
+      this.state.tabnum,
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
+        this.setState({
+          report: res.data.data,
+          lookshow: true,
+        });
+      }
+    });
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].id === text) {
+        this.setState({
+          lookshow: true,
+          name: this.state.dataSource[i].linkman,
+          phone: this.state.dataSource[i].phone,
+          email: this.state.dataSource[i].email,
+        });
+      }
+    }
+  }
+  state = { dblookshow: false }
+  dblifeshowModal = (text) => {
+    getLifecycleDetail([
+      text,
+      this.state.tabnum,
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
+        this.setState({
+          reports: res.data.data,
+          dblookshow: true,
+        });
+      }
+    });
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].id === text) {
+        this.setState({
+          dblookshow: true,
+          name: this.state.dataSource[i].linkman,
+          phone: this.state.dataSource[i].phone,
+          email: this.state.dataSource[i].email,
+        });
+      }
+    }
+  }
+  //获取历史读数（无线单表）
+  state = { historyvisible: false }
+  showhistory = (text) => {
+    getHistoryReading([
+      1,
+      this.state.tabnum,
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
+        this.setState({
+          readout: res.data.data,
+          historyvisible: true,
+        });
+      }
+    });
+    for (var i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].id === text) {
+        this.setState({
+          historyvisible: true,
+          name: this.state.dataSource[i].linkman,
+          phone: this.state.dataSource[i].phone,
+          email: this.state.dataSource[i].email,
+        });
+      }
+    }
+  }
+
+
   onSelectChange = (selectedRowKeys) => {
     console.log('selectedRowKeys changed: ', selectedRowKeys);
     console.log(selectedRowKeys.length)
@@ -325,7 +481,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-                 <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -402,8 +558,8 @@ class journal extends React.Component {
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
                     <TabPane tab="采集器" key="1" style={{ padding: '20px' }}>
-                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px',marginRight:'10px' }}  id="productid"/>
-                    所属水务商:<Input placeholder="请输入水务商名称" style={{ width: '20%', marginLeft: '10px' }}  id="sws"/>
+                      产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px', marginRight: '10px' }} id="productid" />
+                      所属水务商:<Input placeholder="请输入水务商名称" style={{ width: '20%', marginLeft: '10px' }} id="sws" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -426,7 +582,7 @@ class journal extends React.Component {
                       </div>
                     </TabPane>
                     <TabPane tab="无线单表" key="2" style={{ padding: '20px' }}>
-                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }}  id="productid"/>
+                      产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} id="productid" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>
@@ -449,7 +605,7 @@ class journal extends React.Component {
                       </div>
                     </TabPane>
                     <TabPane tab="普通水表" key="3" style={{ padding: '20px' }}>
-                    产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }}  id="productid"/>
+                      产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} id="productid" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                         <Button>重置</Button>

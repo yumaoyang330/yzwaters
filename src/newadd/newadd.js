@@ -62,8 +62,9 @@ class newadd extends Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+    
   }
-  usertype = (value) => {
+  usertypes = (value) => {
     console.log(value)
     this.setState({
       usertype: value,
@@ -90,25 +91,36 @@ class newadd extends Component {
     let model = document.getElementById('model').value;
     let networkoperator = document.getElementById('networkoperator').value;
     let version = document.getElementById('version').value;
-    for (var i = 0; i < this.state.dataSource.length; i++) {
-      this.state.dataSource[i].usertype = this.state.usertype
-      this.state.dataSource[i].type = type;
-      this.state.dataSource[i].model = model;
-      this.state.dataSource[i].networkoperator = networkoperator;
-      this.state.dataSource[i].version = version;
+    if (type === "") {
+      message.error("请输入产品类别");
+    } else if (model === "") {
+      message.error("请输入产品型号");
+    } else if (networkoperator === "") {
+      message.error("请输入产品网络运营商");
+    } else if (version === "") {
+      message.error("请输入产品版本号");
+    } else {
+      this.props.form.validateFields({ force: true }, (error) => {
+        let data = {
+          name: this.state.usertype,
+          model: model,
+          serial: type,
+          networkoperator: networkoperator,
+          version: version,
+        }
+        if (!error) {
+          productadd(data).then(res => {
+            if (res.data && res.data.message === 'success') {
+              message.success("设备添加成功");
+              setTimeout(() => {
+                window.location.href = "/product";
+              }, 1000);
+            }
+          });
+        }
+      });
     }
-    this.props.form.validateFields({ force: true }, (error) => {
-      if (!error) {
-        productadd(
-          JSON.stringify(dataSource)
-        ).then(res => {
-          if (res.data && res.data.status === 'success') {
-            message.success("设备添加成功");
-            window.location.href = "/management";
-          }
-        });
-      }
-    });
+
 
   }
   render() {
@@ -208,25 +220,25 @@ class newadd extends Component {
                   <div className="current_text">
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品名称：</span>
-                      <Select defaultValue={accounttype[0]} onChange={this.usertype} style={{ width: '60%' }}>
+                      <Select defaultValue={accounttype[0]} onChange={this.usertypes} style={{ width: '60%' }}>
                         {productname}
                       </Select>
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品类别：</span>
-                      <Input placeholder="本批设备寿命年限为3年" style={{ width: '60%' }} id="type" />
+                      <Input placeholder="请输入产品类别" style={{ width: '60%' }} id="type" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>产品型号：</span>
-                      <Input placeholder="请输入滤芯供应商" style={{ width: '60%' }} id="model" />
+                      <Input placeholder="请出入产品型号" style={{ width: '60%' }} id="model" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>网络运营商：</span>
-                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="networkoperator" />
+                      <Input placeholder="请出入网络运营商" style={{ width: '60%' }} id="networkoperator" />
                     </div>
                     <div className='addinput'>
                       <span style={{ display: 'inline-block', width: '100px', textAlign: 'right' }}>版本：</span>
-                      <Input placeholder="请输入滤芯维护服务商" style={{ width: '60%' }} id="version" />
+                      <Input placeholder="请输入产品版本号" style={{ width: '60%' }} id="version" />
                     </div>
                     <div className="btn">
                       <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentsubmit}>提交</Button>

@@ -101,6 +101,15 @@ class journal extends React.Component {
       title: '安装时间',
       dataIndex: '安装时间',
       editable: true,
+      render: (text) => {
+        if (text === '0') {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>待安装</span>
+            </div>
+          )
+        }
+      }
     }];
 
     this.column = [{
@@ -156,6 +165,15 @@ class journal extends React.Component {
       title: '安装时间',
       dataIndex: '安装时间',
       editable: true,
+      render: (text) => {
+        if (text === '0') {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>待安装</span>
+            </div>
+          )
+        }
+      }
     }];
 
     this.ptcolumn = [{
@@ -208,6 +226,15 @@ class journal extends React.Component {
       title: '安装时间',
       dataIndex: '安装时间',
       editable: true,
+      render: (text) => {
+        if (text === '0') {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>待安装</span>
+            </div>
+          )
+        }
+      }
     }];
 
 

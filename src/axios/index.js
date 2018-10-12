@@ -7,7 +7,7 @@ const url='http://192.168.31.180:9090';
 
 
 //1.1登录界面
-export const login = (params) => http.post(url + '/auth/oauth/token', {
+export const login = (params) => http.post('http://192.168.31.180:8040/auth/oauth/token', {
 	username: params[0],
 	password: params[1],
 });
@@ -16,8 +16,14 @@ export const login = (params) => http.post(url + '/auth/oauth/token', {
 
 //2.1 产品信息
 //2.1.0 获取省->市->区->单位级联菜单数据
-// export const gets = (params) => http.get(url + '/site/all1', {
-// });
+export const gets = (params) => http.get(url + '/site/all1', {
+});
+
+
+//2.1.0 获取所有省->市->区->单位级联菜单数据
+export const getall = (params) => http.get(url + '/site/all', {
+});
+
 
 
 //2.1.1 获取单位
@@ -45,9 +51,15 @@ export const productdetail = (params) => http.post(url + '/product/detail', {
 
 
 //2.2 新增产品
-export const productadd = (params) => http.post(url + '/product/add', {
-	deviceInsertDTO: params,
+export const productadd = (params) => http.post(url + '/product/add', params);
+
+//2.3 接口信息
+export const getWaterMerchantAPI = (params) => http.get(url + '/information/getWaterMerchantAPI/view', {
 });
+
+
+
+
 //3.1 采集器设备状态
 export const collector = (params) => http.get(url + '/device/state/collector', {
 	signalIntensity: params[0],
@@ -111,16 +123,65 @@ export const collectorbasic = (params) => http.get(url + '/device/basic/collecto
 	districtSite:params[3],
 });
 
+//3.6 设备参数配置
+export const setparameter = (params) => http.get(url + '/device/setting/view', {
+	deviceNum: params[0],
+	type:params[1],
+});
+
+//3.6 修改参数配置
+export const editReportingIntervalW = (params) => http.get(url + '/device/setting/editReportingIntervalW', {
+	deviceNum: params[0],
+	type:params[1],
+});
+
+//3.7 获取历史读数
+export const getHistoryReading = (params) => http.get(url + '/device/basic/getHistoryReading', {
+	deviceNum: params[0],
+	type:params[1],
+});
+
+
 
 
 //4.用户管理
+
 //4.1 获取水务商详情
 
 export const waterMerchant = (params) =>  http.get(url + '/waterMerchant/view', {
 	id:params[0]
 });
 
-//4.1.2 删除水务商 
+//4.1.1 新增水务商 
+export const addwaterMerchant = (params) =>  http.post(url + '/waterMerchant/add', {
+	name:params[0],
+	provinceId:params[1],
+	cityId:params[2],
+	districtId:params[3],
+	districtDetail:params[4],
+	linkman:params[5],
+	phone:params[6],
+	server:params[7],
+	email:params[8],
+});
+
+//4.1.2 新增区域主管 
+export const addchargewater = (params) =>  http.post(url + '/waterMerchant/account/add', {
+	username:params[0],
+	password:params[1],
+	currentUsername:params[2],
+	provinceId:params[3],
+	cityId:params[4],
+	districtId:params[5],
+	waterMerchantId:params[6],
+});
+
+//4.1.3 简洁水务商 
+export const simplewater = (params) =>  http.get(url + '/waterMerchant/simple', {
+	id:params[0]
+});
+
+//4.1.4 删除水务商 
 export const waterdelete = (params) =>  http.post(url + '/waterMerchant/delete', {
 	id:params[0]
 });
@@ -128,6 +189,15 @@ export const waterdelete = (params) =>  http.post(url + '/waterMerchant/delete',
 //4.2 账户管理
 export const accountview = (params) =>  http.get(url + '/userManage/account/view', {
 	id:params[0]
+});
+//4.2.1 用户添加
+export const useradd = (params) =>  http.post(url + '/userManage/account/add', {
+
+});
+//4.2.2 修改用户使用权限
+export const editStatus = (params) =>  http.post(url + '/userManage/account/editStatus', {
+	id:params[0],
+	status:params[1]
 });
 
 //4.3 角色管理
@@ -144,16 +214,19 @@ export const roleadd = (params) =>  http.post(url + '/userManage/roleManege/role
 	name:params[0],
 	value:params[1]
 });
-
-//4.3.4 角色分配
+//4.3.4 删除角色
+export const roledelete = (params) =>  http.get(url + '/userManage/roleManege/role/delete', {
+	id:params[0],
+});
+//4.3.5 角色分配
 export const userrole = (params) =>  http.get(url + '/userManage/roleManege/user_role/view', {
 });
 
-//4.3.5 权限列表  
+//4.3.6 权限列表  
 export const powerlist = (params) =>  http.get(url + '/userManage/roleManege/menu/view', {
 });
 
-//4.3.6 权限分配
+//4.3.7 权限分配
 export const rolemenu = (params) =>  http.get(url + '/userManage/roleManege/role_menu/view', {
 });
 

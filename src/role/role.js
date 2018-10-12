@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input,Popconfirm,message } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input, Popconfirm, message } from 'antd';
 import { Link } from 'react-router-dom';
-import { rolelist,roleadd } from '../axios';
+import { rolelist, roleadd, roledelete } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './role.css';
@@ -23,7 +23,7 @@ class journal extends React.Component {
     }, {
       title: '角色简写',
       dataIndex: 'value',
-    },{
+    }, {
       title: '角色创建时间',
       dataIndex: 'createTime',
     }, {
@@ -60,22 +60,34 @@ class journal extends React.Component {
     console.log(e);
     let rolename = document.getElementById('rolename').value;
     let roleabbr = document.getElementById('roleabbr').value;
-    this.props.form.validateFields({ force: true }, (error) => {
-      if (!error) {
-        roleadd([
-          rolename,
-          roleabbr,
-        ]).then(res => {
-          if (res.data && res.data.message === 'success') {
-            message.success("设备添加成功");
-            window.location.href = "/role";
-          } 
-        });
-      }
+    var telrule = /^[a-zA-Z]+$/;
+    if(rolename===""){
+      message.error('请输入角色名称');
+    }else if (!telrule.test(roleabbr)) {
+      message.error('请输入正确的英文简写');
+      return;
+    } else {
+      this.props.form.validateFields({ force: true }, (error) => {
+        if (!error) {
+          roleadd([
+            rolename,
+            roleabbr,
+          ]).then(res => {
+            if (res.data && res.data.message === 'success') {
+              message.success("设备添加成功");
+              setTimeout(() => {
+                window.location.href = "/role";
+              }, 1000);
+
+            }
+          });
+        }
       })
       this.setState({
         visible: false,
       });
+    }
+
   }
 
   handleCancel = (e) => {
@@ -84,6 +96,32 @@ class journal extends React.Component {
       visible: false,
     });
   }
+
+  onDelete = (text, key) => {
+    console.log(text)
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        roledelete([
+          text,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            message.success("信息删除成功");
+            const dataSource = [...this.state.data];
+            this.setState({
+              num: this.state.num - 1,
+              dataSource: dataSource.filter(item => item.key !== key)
+            });
+            setTimeout(() => {
+              window.location.href = "/role";
+            }, 1000);
+          }
+
+        });
+      }
+    });
+  }
+
+
   componentWillMount = () => {
     document.title = "角色列表";
     function showTime() {
@@ -106,10 +144,10 @@ class journal extends React.Component {
               data: res.data.data,
               num: res.data.data.length,
             });
-          } 
+          }
         });
       }
-      })
+    })
 
 
   }
@@ -151,7 +189,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -237,7 +275,7 @@ class journal extends React.Component {
                   onCancel={this.handleCancel}
                   okText="Save"
                 >
-                  角色名称：<Input placeholder="请输入角色名称" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }}  id="rolename"/>
+                  角色名称：<Input placeholder="请输入角色名称" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} id="rolename" />
                   角色简写：<Input placeholder="请输入角色名称英文简写" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} id="roleabbr" />
                 </Modal>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/roleassignment">角色分配</Link></Button>

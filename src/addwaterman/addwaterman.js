@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Input } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Input, message } from 'antd';
 import { Link } from 'react-router-dom';
+import { gets, addwaterMerchant, getall } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
-import './newaccount.css';
+import './addwaterman.css';
 
 
-
-function handleChange(value) {
-  console.log(`Selected: ${value}`);
-}
-
-
-var accounttype = ['超级管理员', '管理员',];
 const { TextArea } = Input;
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
@@ -24,8 +18,12 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
-      usertype: accounttype[0],
-      size: 'default',
+      province: '江苏省',
+      city: '',
+      area: '',
+      provinceid:'',
+      cityid: '',
+      areaid: '',
     };
   }
   toggle = () => {
@@ -33,9 +31,101 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
-  
+
+  onChange = (date, dateString) => {
+    console.log(dateString)
+    let arr = [];
+    for (var i in dateString) {
+      arr.push(dateString[i].label);
+    }
+    if (arr[1] === undefined) {
+      this.setState({
+        province: arr[0],
+        city: '',
+        area: '',
+        provinceid:dateString[0].id,
+      })
+    } else {
+      if (arr[2] === undefined) {
+        this.setState({
+          province: arr[0],
+          city: arr[1],
+          area: '',
+          provinceid:dateString[0].id,
+          cityid: dateString[1].id,
+        })
+      } else {
+        if (arr[3] === undefined) {
+          this.setState({
+            province: arr[0],
+            city: arr[1],
+            area: arr[2],
+            provinceid:dateString[0].id,
+            cityid: dateString[1].id,
+            areaid: dateString[2].id,
+          });
+        };
+      }
+    }
+
+  }
+
+
+
+  addwatermans = () => {
+    let watermanname = document.getElementById('watermanname').value;
+    let address = document.getElementById('address').value;
+    let chargename = document.getElementById('chargename').value;
+    let chargephone = document.getElementById('chargephone').value;
+    let chargeemail = document.getElementById('chargeemail').value;
+    let serverinf = document.getElementById('serverinf').value;
+    var namerule = /^[\u4E00-\u9FA5A-Za-z]+$/;
+    var telrule = /^[1][3,4,5,7,8][0-9]{9}$/;
+    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if (watermanname === "") {
+      message.error("请输入水务商名称");
+    } else if (address === "") {
+      message.error("请输入详细地址");
+    } else if (!namerule.test(chargename)) {
+      message.error('请输入您的真实姓名');
+    } else if (!telrule.test(chargephone)) {
+      message.error('您输入的手机号码不合法');
+    } else if (!filter.test(chargeemail)) {
+      message.error('您输入的正确的邮箱格式');
+    } else if (serverinf === "") {
+      message.error("请输入服务器信息");
+    } else {
+      this.props.form.validateFields({ force: true }, (error) => {
+        if (!error) {
+          addwaterMerchant([
+            watermanname,
+            this.state.provinceid,
+            this.state.cityid,
+            this.state.areaid,
+            address,
+            chargename,
+            chargephone,
+            serverinf,
+            chargeemail,
+          ]).then(res => {
+            if (res.data && res.data.message === 'success') {
+              message.success("设备添加成功");
+              setTimeout(() => {
+                window.location.href = "/waterman";
+              }, 1000);
+            }
+          });
+        }
+      });
+    }
+  }
+
+
+
+
+
   componentWillMount = () => {
-    document.title = "添加账户";
+    document.title = "添加水务商";
     function showTime() {
       let nowtime = new Date();
       let year = nowtime.getFullYear();
@@ -44,18 +134,23 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        getall([
+
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            this.setState({
+              allarea: res.data.data,
+            });
+          }
+        });
+      }
+    })
   }
   render() {
-    const { size } = this.state;
-    const productname = accounttype.map(productnames => <Option key={productnames}>{productnames}</Option>);
-    const { getFieldProps, getFieldError, getFieldDecorator } = this.props.form;
-    const { selectedRowKeys } = this.state;
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-    };
-    const hasSelected = selectedRowKeys > 0;
-
+    const options = this.state.allarea;
     return (
       <div id="newaccountbody" >
         <Layout>
@@ -67,7 +162,7 @@ class journal extends React.Component {
             <div />
             <div className="Layout-left">
               <Menu
-                defaultSelectedKeys={['7']}
+                defaultSelectedKeys={['6']}
                 defaultOpenKeys={['sub3']}
                 mode="inline"
                 theme="dark"
@@ -136,91 +231,68 @@ class journal extends React.Component {
                 <Icon type="poweroff" style={{ marginRight: '10px' }} />退出
               </span>
               <div className="Administrator">
-                <span></span>{localStorage.getItem('realname')}超级管理员
+                {localStorage.getItem('realname')}超级管理员
             </div>
             </Header>
             <div className="nav">
-              用户管理 / 账户管理 / 添加账户
+              用户管理 / 水务商 / 添加水务商
             </div>
             <div className="tit">
-              添加账户
+              添加水务商
             </div>
             <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
               <div className="current">
                 <div className="current_text">
-                  <div className="explain">
-                    <div>
-                      <span style={{ color: '#000000' }}>尊敬的 </span>
-                      <span style={{ color: "#1890FF" }}></span>
-                      <span style={{ color: "#000000" }}> 你好，依据平台设定，您具有以下账号管理权限：</span>
-                    </div>
-                    <div className='explaintext'>
-                      1.创建各饮水 <span style={{ color: "#1890FF" }}>单位管理员</span> ，以添加他们获得水量预警信息、设备掉线信息。
-                  他们将具有登录平台使用完整的<span style={{ color: "#1890FF" }}> 流量监控</span> 模块、
-                  完整的 <span style={{ color: "#1890FF" }}>设备管理</span> 模块、完整的 <span style={{ color: "#1890FF" }}>查询管理</span> 模块、部分的
-                  <span style={{ color: "#1890FF" }}>账号管理</span> 模块的权限，单位管理员 可创建 <span style={{ color: "#1890FF" }}>产品维护员</span> 账号，
-                  产品维护员可以使用流程监控的 <span style={{ color: "#1890FF" }}>流量告警</span> 功能、
-                  设备管理的 <span style={{ color: "#1890FF" }}>设备在线查询</span> 功能，单位管理员与产品维护员在平台上的所有操作将计入 <span style={{ color: "#1890FF" }}>系统日志</span>。
-                  </div>
-                  </div>
                   <div className="content">
                     <div className='addinput'>
-                      <span>账户类型：</span>
-                      <Select
-                        mode="tags"
-                        size={size}
-                        style={{ width: '60%' }}
-                        placeholder="Please select"
-                        defaultValue={accounttype[0]} 
-                        onChange={handleChange}
-                        // onChange={this.usertypes}
-                      >
-                       {productname}
-                      </Select>
+                      <span>水务商名称：</span>
+                      <Input placeholder="请输入水务商名称" id="watermanname" style={{ width: '60%' }} />
                     </div>
                     <div className='addinput'>
-                      <span>姓名：</span>
-                      <Input placeholder="张三" id="name_val"
-                        placeholder="请输入姓名"
+                      <span>所在地区：</span>
+                      <Cascader
+                        value={[this.state.province, this.state.city, this.state.area, this.state.school]}
+                        changeOnSelect options={options} onChange={this.onChange}
+                        style={{ display: 'inline-block', width: '60%', textAlign: 'left' }}
+                      />
+                    </div>
+                    <div className='addinput'>
+                      <span>详细地址：</span>
+                      <Input placeholder="请输入详细地址" id="address" style={{ width: '60%' }} />
+                    </div>
+                    <div className='addinput'>
+                      <span>负责人姓名：</span>
+                      <Input style={{ width: '60%' }}
+                        id="chargename"
+                        placeholder="请输入负责人姓名"
+                      />
+                    </div>
+                    <div className='addinput'>
+                      <span>负责人电话：</span>
+                      <Input
+                        placeholder="请输入联系电话"
+                        id="chargephone"
                         style={{ width: '60%' }}
                       />
                     </div>
                     <div className='addinput'>
-                      <span>手机：</span>
-                      <Input placeholder="123745758" style={{ width: '60%' }}
-                        id="phone_num"
-                        placeholder="请输入您的手机号"
-                        />
-                    </div>
-                    <div className='addinput'>
-                      <span>邮箱：</span>
-                      <Input placeholder="1234567890@qq.com"
+                      <span>负责人邮箱：</span>
+                      <Input
                         placeholder="请输入邮箱"
+                        id="chargeemail"
                         style={{ width: '60%' }}
                       />
                     </div>
                     <div className='addinput'>
-                      <span>用户名：</span>
+                      <span>服务器信息：</span>
                       <Input placeholder="aaa"
-                        placeholder="请输入用户名"
+                        placeholder="请输入服务器信息"
+                        id="serverinf"
                         style={{ width: '60%' }}
                       />
                     </div>
-                    <div className='addinput'>
-                      <span>初始密码：</span>
-                      <Input placeholder="123456"
-                        placeholder="请输入密码"
-                        style={{ width: '60%' }}
-                      />
-                    </div>
-                    {/* <div className='addtextarea'>
-                      备注：
-                        <TextArea rows={4} style={{ marginTop: '20px' }} id="remake"
-                        placeholder="请输入备注（选填）"
-                      />
-                    </div> */}
                     <div className="btn">
-                      <Button type="primary" style={{ marginRight: '20px' }} onClick={this.submit}>提交</Button>
+                      <Button type="primary" style={{ marginRight: '20px' }} onClick={this.addwatermans}>提交</Button>
                       <Button><a href="">重置</a></Button>
                     </div>
                   </div>

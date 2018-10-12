@@ -47,22 +47,20 @@ export default {
   post(url, data) {
     return axios({
       method: 'post',
+      header: {},
       // baseURL: 'https://cnodejs.org/api/v1',
       url,
       data: qs.stringify(data),
-      // headers:{
-      //   'Content-Type':'application/json',
-      // },
       timeout: 10000,
     }).then(
       (response) => {
         return checkStatus(response);
       }
-      ).then(
+    ).then(
       (res) => {
         return checkCode(res);
       }
-      )
+    )
   },
   get(url, params) {
     // const user = JSON.parse(localStorage.getItem('user')).token;
@@ -77,11 +75,11 @@ export default {
       (response) => {
         return checkStatus(response)
       }
-      ).then(
+    ).then(
       (res) => {
         return checkCode(res)
       }
-      )
+    )
   },
 
   put(url, params) {
@@ -97,10 +95,10 @@ export default {
       (response) => {
         return checkStatus(response)
       }
-      ).then(
+    ).then(
       (res) => {
         return checkCode(res)
       }
-      )
+    )
   }
 }

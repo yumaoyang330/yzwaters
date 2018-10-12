@@ -32,6 +32,8 @@ import power from './power/power';
 import powerassignment from './powerassignment/powerassignment';
 import newadd from './newadd/newadd';
 import parameter from './parameter/parameter';
+import addwaterman from './addwaterman/addwaterman';
+import addchargeman from './addchargeman/addchargeman';
 
 ReactDOM.render(
   <Router >
@@ -63,6 +65,8 @@ ReactDOM.render(
         <Route path='/newaccount' component={newaccount} />
         <Route path='/role' component={role} />
         <Route path='/roleassignment' component={roleassignment} />
+        <Route path='/addchargeman' component={addchargeman} />
+        <Route path='/addwaterman' component={addwaterman} />
         <Route path='/power' component={power} />
         <Route path='/powerassignment' component={powerassignment} />
       {/* </Route>

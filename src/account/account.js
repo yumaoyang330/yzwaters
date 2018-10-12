@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Popconfirm, Select, Table, Input } from 'antd';
-import { accountview } from '../axios';
+import { Icon, Menu, Layout, Button, Tabs, Popconfirm, Select, Table, Input, message } from 'antd';
+import { accountview, editStatus } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -37,18 +37,43 @@ class journal extends React.Component {
       dataIndex: 'gmtcreate',
       editable: true,
     }, {
-      title: '操作',
-      dataIndex: 'id',
+      title: '账户状态',
+      dataIndex: 'status',
       render: (text, record, index) => {
-        return (
-          <div>
-            <span style={{ marginLeft: '10px' }}>
-              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
-                <a href="javascript:;">删除</a>
+        if (text === 1) {
+          return (
+            <div>
+              <span style={{ color: 'green' }}>
+                <Popconfirm title="确定要禁用吗?" onConfirm={() => this.onDelete(text)}>
+                  正常
               </Popconfirm>
-            </span>
-          </div>
-        );
+              </span>
+            </div>
+          );
+        }
+        if (text === 0) {
+          return (
+            <div>
+              <span style={{ color: 'red' }}>
+                <Popconfirm title="确定要启用吗?" onConfirm={() => this.onDelete(text)}>
+                  禁用
+              </Popconfirm>
+              </span>
+            </div>
+          );
+        }
+        if (text === 2) {
+          return (
+            <div>
+              <span style={{ color: 'purple' }}>
+                <Popconfirm title="确定要激活吗?" onConfirm={() => this.onDelete(text)}>
+                  未激活
+              </Popconfirm>
+              </span>
+            </div>
+          );
+        }
+
       },
     },
     ];
@@ -59,29 +84,30 @@ class journal extends React.Component {
     });
   }
 
-  // onDelete = (text,key) => {
-  //   console.log(text)
-  //   this.props.form.validateFields({ force: true }, (error) => {
-  //     if (!error) {
-  //       productdelete([
-  //         text,
-  //       ]).then(res => {
-  //         if (res.data && res.data.message === 'success') {
-  //           message.success("信息删除成功");
-  //           const dataSource = [...this.state.data];
-  //           this.setState({
-  //             num: this.state.num - 1,
-  //             dataSource: dataSource.filter(item => item.key !== key)
-  //           });
-  //           setTimeout(() => {
-  //             window.location.href = "/account";
-  //           }, 1000);
-  //         } 
+  onDelete = (text, key) => {
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        editStatus([
+          this.state.data[text].status,
+          text,
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            if (this.state.data[text].status === 0) {
+              this.state.data[text].status = 1
+            } else if (this.state.data[text].status === 1) {
+              this.state.data[text].status = 0
+            } 
+            alert(this.state.data[text].status)
+            message.success("状态更改成功");
 
-  //       });
-  //     }
-  //   });
-  // }
+            // setTimeout(() => {
+            //   window.location.href = "/account";
+            // }, 1000);   
+          }
+        });
+      }
+    });
+  }
 
 
   componentWillMount = () => {
@@ -106,10 +132,10 @@ class journal extends React.Component {
               data: res.data.data,
               num: res.data.data.length,
             });
-          } 
+          }
         });
       }
-      })
+    })
 
   }
   render() {

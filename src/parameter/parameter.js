@@ -1,149 +1,232 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal, message } from 'antd';
-import { wirelessbasic, generalbasic, collectorbasic } from '../axios';
+import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Form, Popconfirm, InputNumber, message } from 'antd';
+import { setparameter, editReportingIntervalW } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './parameter.css';
 
 const Option = Select.Option;
+
+const switchtypes = ['关阀', '半悬', '开阀'];
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
+const FormItem = Form.Item;
+const typetext = {
+  "0": "关阀",
+  "1": '半悬',
+  "2": '开阀',
+};
+const typenum = {
+  "关阀": '0',
+  "半悬": '1',
+  "开阀": '2',
+};
+const EditableContext = React.createContext();
+const EditableRow = ({ form, index, ...props }) => (
+  <EditableContext.Provider value={form}>
+    <tr {...props} />
+  </EditableContext.Provider>
+);
+
+const EditableFormRow = Form.create()(EditableRow);
+class EditableCell extends React.Component {
+  getInput = () => {
+    if (this.props.inputType === 'number') {
+      return <InputNumber />;
+    }
+    return <Input />;
+  };
+  render() {
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      ...restProps
+    } = this.props;
+    return (
+      <EditableContext.Consumer>
+        {(form) => {
+          const { getFieldDecorator } = form;
+          return (
+            <td {...restProps}>
+              {editing ? (
+                <FormItem style={{ margin: 0 }}>
+                  {getFieldDecorator(dataIndex, {
+                    rules: [{
+                      required: true,
+                      message: `Please Input ${title}!`,
+                    }],
+                    initialValue: record[dataIndex],
+                  })(this.getInput())}
+                </FormItem>
+              ) : restProps.children}
+            </td>
+          );
+        }}
+      </EditableContext.Consumer>
+    );
+  }
+}
 class journal extends React.Component {
+
   constructor(props) {
+    const typeOptions = switchtypes.map(type => <Option key={type}>{type}</Option>);
     super(props);
     this.state = {
       collapsed: false,
+      editingKey: '',
+      keylist:'',
     };
 
-    this.column = [{
-      title: '发货单位',
-      dataIndex: '发货单位',
-    }, {
-      title: '历史读数',
-      dataIndex: 'location',
-      render: (text, record, index) =>
-        <div>
-          <a onClick={() => this.showModal(record.key)}
-          >详情</a>
-          <Modal
-            title="联系方式"
-            // maskStyle={{ background: "black", opacity: '0.1' }}
-            visible={this.state.visible}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-            mask={false}
-          >
-            <p>姓名:{this.state.name}</p>
-            <p>电话:{this.state.phone}</p>
-            <p>邮箱:{this.state.email}</p>
-            <p>地址:{this.state.organization}</p>
-            <p>备注:{this.state.content}</p>
-          </Modal>
-        </div>
-    }, {
-      title: '水表编号',
-      dataIndex: 'district_id',
-    }, {
-      title: '网络运营商',
-      dataIndex: '网络运营商',
-    }, {
-      title: '水表类型',
-      dataIndex: '水表类型',
-    }, {
-      title: '连网IP，连网端口',
-      dataIndex: '连网IP，连网端口',
-    }, {
-      title: '安装起始读数',
-      dataIndex: '起始读数',
-    }, {
-      title: '设备生命周期',
-      dataIndex: 'resPerson.name',
-      render: (text, record, index) =>
-        <div>
-          <a onClick={() => this.showModal(record.key)}
-          >详情</a>
-          <Modal
-            title="联系方式"
-            // maskStyle={{ background: "black", opacity: '0.1' }}
-            visible={this.state.visible}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-            mask={false}
-          >
-            <p>姓名:{this.state.name}</p>
-            <p>电话:{this.state.phone}</p>
-            <p>邮箱:{this.state.email}</p>
-            <p>地址:{this.state.organization}</p>
-            <p>备注:{this.state.content}</p>
-          </Modal>
-        </div>
-    }, {
-      title: '设备安装时间',
-      dataIndex: '设备安装时间',
-    }, {
-      title: '详情',
-      dataIndex: 'resPerson.name',
-      render: (text, record, index) =>
-        <div>
-          <a onClick={() => this.showModal(record.key)}
-          >详情</a>
-          <Modal
-            title="联系方式"
-            // maskStyle={{ background: "black", opacity: '0.1' }}
-            visible={this.state.visible}
-            onOk={this.handleOk}
-            onCancel={this.handleCancel}
-            mask={false}
-          >
-            <p>姓名:{this.state.name}</p>
-            <p>电话:{this.state.phone}</p>
-            <p>邮箱:{this.state.email}</p>
-            <p>地址:{this.state.organization}</p>
-            <p>备注:{this.state.content}</p>
-          </Modal>
-        </div>
-    }];
 
     this.sbcolumn = [{
-      title: '水表编号',
-      dataIndex: 'general_num',
-    }, {
-      title: '水表门牌号',
-      dataIndex: '水表门牌号',
-    }, {
-      title: '软件版本',
-      dataIndex: '软件版本',
-    }, {
-      title: '所属采集器号',
-      dataIndex: '所属采集器号',
-    }, {
-      title: '所属发货单号',
-      dataIndex: '所属发货单号',
-    }];
-
-
-    this.columns = [{
       title: '产品名称',
-      dataIndex: 'IMEI',
+      dataIndex: '产品名称',
+      editable: true,
+    }, {
+      title: '产品编号',
+      dataIndex: 'general_num',
+      editable: true,
     }, {
       title: '开关阀设置',
-      dataIndex: '版本号',
+      dataIndex: '开关阀设置',
+      editable: true,
+      render: (text, record, index) => {
+        const editable = this.isEditing(record);
+        return (
+          <div>
+            {editable ? (
+              <Select defaultValue={typetext[text]} className="one" onChange={this.typeChange} style={{ width: '80%' }} disabled={false} >
+                {typeOptions}
+              </Select>
+            ) : (
+                <Select defaultValue={typetext[text]} className="one" onChange={this.typeChange} style={{ width: '80%' }} disabled={true} >
+                  {typeOptions}
+                </Select>
+              )
+            }</div>
+        )
+      }
     }, {
-      title: '上传时间',
-      dataIndex: 'collector_num',
-    }, {
-      title: '集中器类型',
-      dataIndex: '集中器类型',
+      title: '所属采集器',
+      dataIndex: '集中器号',
+      editable: true,
     }, {
       title: '操作',
-      dataIndex: '电流',
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        const editable = this.isEditing(record);
+        return (
+          <div>
+            {editable ? (
+              <span>
+                <EditableContext.Consumer>
+                  {form => (
+                    <a
+                      href="javascript:;"
+                      onClick={() => this.save(form, record.key, index)}
+                      style={{ marginRight: 8 }}
+                    >
+                      保存
+                      </a>
+                  )}
+                </EditableContext.Consumer>
+                <Popconfirm
+                  title="确认要取消吗?"
+                  onConfirm={() => this.cancel(record.key)}
+                >
+                  <a>取消</a>
+                </Popconfirm>
+              </span>
+            ) : (
+                <a onClick={() => this.edit(record.key)}>编辑</a>
+              )}
+          </div>
+        );
+      }
+
+    }
+    ];
+
+
+    this.column = [{
+      title: '产品名称',
+      dataIndex: '产品名称',
+      editable: true,
+    }, {
+      title: '产品编号',
+      dataIndex: 'wireless_num',
+    }, {
+      title: '开关阀设置',
+      dataIndex: '开关阀设置',
+      render: (text, record) => {
+        const editable = this.isEditing(record);
+        return (
+          <div>
+            {editable ? (
+              <Select defaultValue={typetext[text]} className="one" onChange={this.typeChange} style={{ width: '80%' }} disabled={false} >
+                {typeOptions}
+              </Select>
+            ) : (
+                <Select defaultValue={typetext[text]} className="one" onChange={this.typeChange} style={{ width: '80%' }} disabled={true} >
+                  {typeOptions}
+                </Select>
+              )
+            }</div>
+        )
+      }
+    }, {
+      title: '上传时间间隔',
+      dataIndex: '上传时间间隔',
+      editable: true,
+    }, {
+      title: '操作',
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        const editable = this.isEditing(record);
+        return (
+          <div>
+            {editable ? (
+              <span>
+                <EditableContext.Consumer>
+                  {form => (
+                    <a
+                      href="javascript:;"
+                      onClick={() => this.save(form, record.key, index)}
+                      style={{ marginRight: 8 }}
+                    >
+                      保存
+                      </a>
+                  )}
+                </EditableContext.Consumer>
+                <Popconfirm
+                  title="确认要取消吗?"
+                  onConfirm={() => this.cancel(record.key)}
+                >
+                  <a>取消</a>
+                </Popconfirm>
+              </span>
+            ) : (
+                <a onClick={() => this.edit(record.key)}>编辑</a>
+              )}
+          </div>
+        );
+      }
     }
     ];
   }
 
-
+  typeChange = (date, dateString) => {
+    this.setState({
+      selecttype: date,
+      selectnum: typenum[date],
+    });
+  }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
@@ -157,6 +240,74 @@ class journal extends React.Component {
       keylist: selectedRowKeys,
     });
   }
+  typeChange = (date, dateString) => {
+    this.setState({
+      selecttype: date,
+      selectnum: typenum[date],
+    });
+  }
+  edit(key) {
+    this.setState({
+      editingKey: key,
+    });
+  }
+  isEditing = (record) => {
+    return record.text === this.state.editingKey;
+  };
+  save(form, key) {
+    form.validateFields((error, row) => {
+      if (error) {
+        return;
+      }
+      const newData = [...this.state.data];
+      const index = newData.findIndex(item => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        this.setState({
+          data: newData, editingKey: '',
+        }, () => {
+          this.props.form.validateFields({ force: true }, (error) => {
+            if (!error) {
+              editReportingIntervalW([
+                key,
+                this.state.preAlertThreshold,
+                this.state.alertThreshold,
+              ]).then(res => {
+                if (res.data && res.data.status === 1) {
+                  if (res.data.updateResult === 1) {
+                    message.success("信息编辑成功");
+                  } else {
+                    message.error("信息编辑失败");
+                  }
+                } else {
+                  message.error("加载失败");
+                }
+              });
+            } else {
+              message.error("请填好所有选项");
+            }
+          });
+
+        });
+      } else {
+        newData.push(this.state.data);
+        this.setState({ data: newData, editingKey: '' });
+      }
+    });
+  }
+
+
+
+
+  
+  cancel = () => {
+    this.setState({ editingKey: '' });
+  };
+
   componentWillMount = () => {
     document.title = "设备基本信息";
     function showTime() {
@@ -169,11 +320,9 @@ class journal extends React.Component {
     setInterval(showTime, 1000);
 
 
-    wirelessbasic([
-      '',
-      '',
-      '',
-      '',
+    setparameter([
+      null,
+      1,
     ]).then(res => {
       if (res.data && res.data.message === 'success') {
         console.log(res.data.data)
@@ -185,27 +334,9 @@ class journal extends React.Component {
     });
 
 
-    collectorbasic([
-      '',
-      '',
-      '',
-      '',
-    ]).then(res => {
-      if (res.data && res.data.message === 'success') {
-        console.log(res.data.data)
-        this.setState({
-          data: res.data.data,
-          num: res.data.data.length,
-        });
-      }
-    });
-
-
-    generalbasic([
-      '',
-      '',
-      '',
-      '',
+    setparameter([
+      null,
+      3,
     ]).then(res => {
       if (res.data && res.data.message === 'success') {
         console.log(res.data.data)
@@ -215,29 +346,23 @@ class journal extends React.Component {
         });
       }
     });
+
+
   }
   render() {
+    const components = {
+      body: {
+        row: EditableFormRow,
+        cell: EditableCell,
+      },
+    };
+
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
     };
     const hasSelected = selectedRowKeys > 0;
-    const columns = this.columns.map((col) => {
-      if (!col.editable) {
-        return col;
-      }
-      return {
-        ...col,
-        onCell: record => ({
-          record,
-          inputType: col.dataIndex === 'age' ? 'number' : 'text',
-          dataIndex: col.dataIndex,
-          title: col.title,
-        }),
-      };
-    });
-
     const column = this.column.map((col) => {
       if (!col.editable) {
         return col;
@@ -361,31 +486,7 @@ class journal extends React.Component {
               <div className="current">
                 <div className="curr">
                   <Tabs onChange={this.tabchange} type="card" style={{ background: 'white' }}>
-                    <TabPane tab="采集器" key="1" style={{ padding: '20px' }}>
-                      产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px', marginRight: '10px' }} id="productid" />
-                      所属水务商:<Input placeholder="请输入水务商名称" style={{ width: '20%', marginLeft: '10px' }} id="sws" />
-                      <div style={{ float: "right" }}>
-                        <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
-                        <Button>重置</Button>
-                      </div>
-                      <div className="derive">
-                        <Icon type="info-circle-o" />
-                        &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
-                          {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
-                        </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
-                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
-                      </div>
-                      <div style={{ marginTop: '10px' }}>
-                        <Table
-                          rowSelection={rowSelection}
-                          dataSource={this.state.data}
-                          columns={columns}
-                          rowClassName="editable-row"
-                        />
-                      </div>
-                    </TabPane>
-                    <TabPane tab="无线单表" key="2" style={{ padding: '20px' }}>
+                    <TabPane tab="无线单表" key="1" style={{ padding: '20px' }}>
                       产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} id="productid" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
@@ -408,7 +509,7 @@ class journal extends React.Component {
                         />
                       </div>
                     </TabPane>
-                    <TabPane tab="普通水表" key="3" style={{ padding: '20px' }}>
+                    <TabPane tab="普通水表" key="2" style={{ padding: '20px' }}>
                       产品名称:<Input placeholder="请输入产品名称" style={{ width: '20%', marginLeft: '10px' }} id="productid" />
                       <div style={{ float: "right" }}>
                         <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
@@ -426,6 +527,7 @@ class journal extends React.Component {
                         <Table
                           rowSelection={rowSelection}
                           dataSource={this.state.dataSource}
+                          components={components}
                           columns={sbcolumn}
                           rowClassName="editable-row"
                         />

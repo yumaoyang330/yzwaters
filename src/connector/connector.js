@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, Modal } from 'antd';
 import { Link } from 'react-router-dom';
+import {getWaterMerchantAPI } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './connector.css';
@@ -46,14 +47,15 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
+      selectedRowKeys: [],
     };
     this.columns = [{
       title: '水务商名称',
-      dataIndex: 'deviceId',
+      dataIndex: '水务商',
       editable: true,
     }, {
       title: '接口地址',
-      dataIndex: 'location',
+      dataIndex: '接口地址',
       editable: true,
     }];
   }
@@ -61,6 +63,10 @@ class journal extends React.Component {
     this.setState({
       collapsed: !this.state.collapsed,
     });
+  }
+  onSelectChange = (selectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    this.setState({ selectedRowKeys });
   }
   componentWillMount = () => {
     document.title = "接口信息";
@@ -72,6 +78,24 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        getWaterMerchantAPI([
+          '',
+        ]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            console.log(res.data.data)
+            this.setState({
+              data: res.data.data,
+              num: res.data.data.length,
+            });
+          } 
+        });
+      }
+      })
+
+
   }
   render() {
     const { selectedRowKeys } = this.state;
@@ -79,7 +103,7 @@ class journal extends React.Component {
       selectedRowKeys,
       onChange: this.onSelectChange,
     };
-    const hasSelected = selectedRowKeys > 0;
+    const hasSelected = selectedRowKeys.length > 0;
     const columns = this.columns.map((col) => {
       if (!col.editable) {
         return col;

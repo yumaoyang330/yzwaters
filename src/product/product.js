@@ -17,40 +17,8 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
-      datas: '',
+      selectedRowKeys: [],
     };
-
-    this.columns = [{
-      title: '产品类别',
-      dataIndex: 'model',
-    }, {
-      title: '产品名称',
-      dataIndex: 'name',
-    }, {
-      title: '型号',
-      dataIndex: 'serial',
-    }, {
-      title: '网络运营商',
-      dataIndex: 'networkoperator',
-    }, {
-      title: '版本',
-      dataIndex: 'version',
-    }, {
-      title: '操作',
-      dataIndex: 'id',
-      render: (text, record, index) => {
-        return (
-          <div>
-            <span style={{ marginLeft: '10px' }}>
-              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
-                <a href="javascript:;">删除</a>
-              </Popconfirm>
-            </span>
-          </div>
-        );
-      },
-    },
-    ];
   }
   toggle = () => {
     this.setState({
@@ -58,6 +26,11 @@ class journal extends React.Component {
     });
   }
 
+  onSelectChange = (selectedRowKeys) => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    console.log(selectedRowKeys.length)
+    this.setState({ selectedRowKeys });
+  }
   onDelete = (text,key) => {
     console.log(text)
     this.props.form.validateFields({ force: true }, (error) => {
@@ -143,13 +116,43 @@ class journal extends React.Component {
 
   }
   render() {
-    const options = this.state.dataSource;
+    this.columns = [{
+      title: '产品类别',
+      dataIndex: 'model',
+    }, {
+      title: '产品名称',
+      dataIndex: 'name',
+    }, {
+      title: '型号',
+      dataIndex: 'serial',
+    }, {
+      title: '网络运营商',
+      dataIndex: 'networkoperator',
+    }, {
+      title: '版本',
+      dataIndex: 'version',
+    }, {
+      title: '操作',
+      dataIndex: 'id',
+      render: (text, record, index) => {
+        return (
+          <div>
+            <span style={{ marginLeft: '10px' }}>
+              <Popconfirm title="确定要删除吗?" onConfirm={() => this.onDelete(text)}>
+                <a href="javascript:;">删除</a>
+              </Popconfirm>
+            </span>
+          </div>
+        );
+      },
+    },
+    ];
     const { selectedRowKeys } = this.state;
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange,
     };
-    const hasSelected = selectedRowKeys > 0;
+    const hasSelected = selectedRowKeys.length > 0;
     const columns = this.columns.map((col) => {
       if (!col.editable) {
         return col;
@@ -161,6 +164,7 @@ class journal extends React.Component {
           inputType: col.dataIndex === 'age' ? 'number' : 'text',
           dataIndex: col.dataIndex,
           title: col.title,
+          editing: this.isEditing(record),
         }),
       };
     });
@@ -263,8 +267,8 @@ class journal extends React.Component {
               <div className="derive">
                 <Icon type="info-circle-o" />
                 &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
-                  {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
-                </span>条记录
+                {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
+                </span>   条记录
                 列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
                 <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
               </div>
