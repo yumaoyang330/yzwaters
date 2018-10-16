@@ -21,20 +21,6 @@ class journal extends React.Component {
       collapsed: false,
       time: myDate,
     };
-    this.columns = [{
-      title: '产品名称',
-      dataIndex: 'deviceId',
-    }, {
-      title: '产品编号',
-      dataIndex: 'location',
-    }, {
-      title: '产品入库时间',
-      dataIndex: 'status',
-    }, {
-      title: '操作',
-      dataIndex: 'siteName',
-    }
-    ];
   }
   toggle = () => {
     this.setState({
@@ -53,26 +39,6 @@ class journal extends React.Component {
     setInterval(showTime, 1000);
   }
   render() {
-    const { selectedRowKeys } = this.state;
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-    };
-    const hasSelected = selectedRowKeys > 0;
-    const columns = this.columns.map((col) => {
-      if (!col.editable) {
-        return col;
-      }
-      return {
-        ...col,
-        onCell: record => ({
-          record,
-          inputType: col.dataIndex === 'age' ? 'number' : 'text',
-          dataIndex: col.dataIndex,
-          title: col.title,
-        }),
-      };
-    });
     return (
       <div id="historytbody" >
         <Layout>
@@ -163,23 +129,13 @@ class journal extends React.Component {
               产品入库
             </div>
             <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, paddingTop: '10px' }}>
-              <div className="derive">
-                <Icon type="info-circle-o" />
-                &nbsp; &nbsp;已选择<span style={{ marginLeft: 8, color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>
-                  {hasSelected ? `   ${selectedRowKeys.length}  ` : ''}
-                </span>条记录
-                列表记录总计： <span style={{ color: 'rgba(0, 51, 255, 0.647058823529412)', fontWeight: 'bold' }}>{this.state.num}</span> 条
-                <Button type="primary" style={{ float: 'right', marginTop: '3px' }}>数据导出</Button>
-              </div>
-              <div style={{ marginTop: '10px' }}>
-                <Table
-                  rowSelection={rowSelection}
-                  dataSource={this.state.data}
-                  columns={columns}
-                  rowClassName="editable-row"
-                />
-              </div>
+            <div style={{width:"100%",textAlign:'center',fontWeight:'bold',fontSize:'20px',color:'black'}}>扫码信息</div>
+            <div style={{width:'60%',margin:'0 auto',height:"500px",marginTop:'20px',borderRadius:'10px',border:"1px solid #999"}}>
+
+            </div>
+            <div style={{width:'60%',margin:'0 auto'}}>
               <Button type="primary" style={{ marginRight: '20px', float: 'right', marginTop: '20px' }} onClick={this.equipmentquery}>提交</Button>
+            </div>
             </Content>
           </Layout>
         </Layout>

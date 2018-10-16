@@ -101,10 +101,8 @@ export const wirelessbasic = (params) => http.get(url + '/device/basic/wireless'
 });
 //3.4.1 无线单表详情
 export const getDeviceDetail = (params) => http.get(url + '/device/basic/getDeviceDetail', {
-	networkOperator: params[0],
+	id: params[0],
 	type:params[1],
-	districtId:params[2],
-	districtSite:params[3],
 });
 
 //3.5 普通水表基本信息
@@ -169,12 +167,21 @@ export const addwaterMerchant = (params) =>  http.post(url + '/waterMerchant/add
 export const addchargewater = (params) =>  http.post(url + '/waterMerchant/account/add', {
 	username:params[0],
 	password:params[1],
-	currentUsername:params[2],
-	provinceId:params[3],
-	cityId:params[4],
-	districtId:params[5],
-	waterMerchantId:params[6],
+	name:params[2],
+	phone:params[3],
+	email:params[4],
+	currentUsername:params[5],
+	provinceId:params[6],
+	cityId:params[7],
+	districtId:params[8],
+	waterMerchantId:params[9],
 });
+
+//4.1.2.1  查看区域主管 
+export const showchargewater = (params) =>  http.post(url + '/waterMerchant/account/view', {
+	id:params[0],
+});
+
 
 //4.1.3 简洁水务商 
 export const simplewater = (params) =>  http.get(url + '/waterMerchant/simple', {
@@ -188,6 +195,10 @@ export const waterdelete = (params) =>  http.post(url + '/waterMerchant/delete',
 
 //4.2 账户管理
 export const accountview = (params) =>  http.get(url + '/userManage/account/view', {
+	id:params[0]
+});
+
+export const accountviews = (params) =>  http.get(url + '/userManage/account/view', {
 	id:params[0]
 });
 //4.2.1 用户添加
@@ -214,6 +225,12 @@ export const roleadd = (params) =>  http.post(url + '/userManage/roleManege/role
 	name:params[0],
 	value:params[1]
 });
+
+//4.3.3.1 简洁角色
+export const simpleuser = (params) =>  http.get(url + '/userManage/roleManege/role/simple', {
+	id:params[0],
+});
+
 //4.3.4 删除角色
 export const roledelete = (params) =>  http.get(url + '/userManage/roleManege/role/delete', {
 	id:params[0],

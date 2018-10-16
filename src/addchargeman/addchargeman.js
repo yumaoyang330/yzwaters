@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Input, message } from 'antd';
 import { Link } from 'react-router-dom';
-import { addchargewater, getall, waterMerchant ,simplewater} from '../axios';
+import { addchargewater, getall, simplewater } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './addchargeman.css';
@@ -36,7 +36,10 @@ class journal extends React.Component {
     });
   }
   typeChange = (date, dateString) => {
-    console.log(date,dateString)
+    console.log(date, dateString)
+    this.setState({
+      waterMerchantId: date,
+    });
   }
   onChange = (date, dateString) => {
     console.log(dateString)
@@ -79,45 +82,43 @@ class journal extends React.Component {
 
 
   addwatermans = () => {
-    let watermanname = document.getElementById('watermanname').value;
-    let address = document.getElementById('address').value;
+    let account = document.getElementById('account').value;
+    let chargepassword = document.getElementById('chargepassword').value;
     let chargename = document.getElementById('chargename').value;
     let chargephone = document.getElementById('chargephone').value;
     let chargeemail = document.getElementById('chargeemail').value;
-    let serverinf = document.getElementById('serverinf').value;
     var namerule = /^[\u4E00-\u9FA5A-Za-z]+$/;
     var telrule = /^[1][3,4,5,7,8][0-9]{9}$/;
     var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-    if (watermanname === "") {
-      message.error("请输入水务商名称");
-    } else if (address === "") {
-      message.error("请输入详细地址");
+    if (account === "") {
+      message.error("请输入账号");
+    } else if (chargepassword === "") {
+      message.error("请输入密码");
     } else if (!namerule.test(chargename)) {
       message.error('请输入您的真实姓名');
     } else if (!telrule.test(chargephone)) {
       message.error('您输入的手机号码不合法');
     } else if (!filter.test(chargeemail)) {
       message.error('您输入的正确的邮箱格式');
-    } else if (serverinf === "") {
-      message.error("请输入服务器信息");
     } else {
       this.props.form.validateFields({ force: true }, (error) => {
         if (!error) {
           addchargewater([
-            watermanname,
+            account,
+            chargepassword,
+            chargename,
+            chargephone,
+            chargeemail,
+            'super',
             this.state.provinceid,
             this.state.cityid,
             this.state.areaid,
-            address,
-            chargename,
-            chargephone,
-            serverinf,
-            chargeemail,
+            this.state.waterMerchantId,
           ]).then(res => {
             if (res.data && res.data.message === 'success') {
-              message.success("设备添加成功");
+              message.success("区域主管添加成功");
               setTimeout(() => {
-                window.location.href = "/waterman";
+                window.location.href = "/lookchargeman";
               }, 1000);
             }
           });
@@ -160,9 +161,9 @@ class journal extends React.Component {
       if (!error) {
         simplewater([]).then(res => {
           if (res.data && res.data.message === 'success') {
-            this.setState({
-              watermanarrs : res.data.data
-            });
+            for (var i = 0; i < res.data.data.length; i++) {
+              watermanarrs.push(res.data.data[i])
+            }
           }
         });
       }
@@ -171,8 +172,8 @@ class journal extends React.Component {
   }
 
   render() {
-    const switchtypes = watermanarrs;
-    const watermanlist = switchtypes.map(name => <Option key={name}>{name}</Option>);
+    console.log(watermanarrs)
+    const provinceOptions = watermanarrs.map((province, id) => <Option key={province.id}>{province.name}</Option>);
     const options = this.state.allarea;
     return (
       <div id="newaccountbody" >
@@ -287,20 +288,36 @@ class journal extends React.Component {
                       />
                     </div>
                     <div className='addinput'>
-                      <span>当前用户：</span>
-                      <Input
-                        placeholder="当前用户"
-                        id="currentUsername"
-                        style={{ width: '60%' }}
+                      <span>用户姓名：</span>
+                      <Input style={{ width: '60%' }}
+                        id="chargename"
+                        placeholder="请输入用户真实姓名"
+                      />
+                    </div>
+                    <div className='addinput'>
+                      <span>联系方式：</span>
+                      <Input style={{ width: '60%' }}
+                        id="chargephone"
+                        placeholder="请输入用户电话"
+                      />
+                    </div>
+                    <div className='addinput'>
+                      <span>邮箱：</span>
+                      <Input style={{ width: '60%' }}
+                        id="chargeemail"
+                        placeholder="请输入用户邮箱"
                       />
                     </div>
                     <div className='addinput'>
                       <span>所属水务商：</span>
-                      {/* <Select defaultValue={typetext[text]} className="one" onChange={this.typeChange} style={{ width: '80%' }} disabled={true} >
-                        {this.state.watermanname}
-                      </Select> */}
-                      <Select className="one" onChange={this.typeChange} style={{ width: '60%' }} defaultValue={watermanarrs[0]}>
-                        {watermanlist}
+                      <Select
+                        className="one"
+                        onChange={this.typeChange}
+                        style={{ width: '60%' }}
+                        defaultValue={provinceOptions[0]}
+                        placeholder="请选择水务商"
+                      >
+                        {provinceOptions}
                       </Select>
                     </div>
                     <div className="btn">

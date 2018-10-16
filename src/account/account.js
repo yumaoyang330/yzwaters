@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Popconfirm, Select, Table, Input, message } from 'antd';
 import { accountview, editStatus } from '../axios';
 import { Link } from 'react-router-dom';
-import moment from 'moment';
 import { createForm } from 'rc-form';
 import './account.css';
 
@@ -19,23 +18,18 @@ class journal extends React.Component {
     this.columns = [{
       title: '账户类别',
       dataIndex: '账户类别',
-      editable: true,
     }, {
       title: '账户名',
       dataIndex: 'username',
-      editable: true,
     }, {
       title: '联系方式',
       dataIndex: 'phone',
-      editable: true,
     }, {
       title: '邮箱',
       dataIndex: 'email',
-      editable: true,
     }, {
       title: '创建时间',
       dataIndex: 'gmtcreate',
-      editable: true,
     }, {
       title: '账户状态',
       dataIndex: 'status',
@@ -44,7 +38,7 @@ class journal extends React.Component {
           return (
             <div>
               <span style={{ color: 'green' }}>
-                <Popconfirm title="确定要禁用吗?" onConfirm={() => this.onDelete(text)}>
+                <Popconfirm title="确定要禁用吗?" onConfirm={() => this.statuschange(text, index)}>
                   正常
               </Popconfirm>
               </span>
@@ -55,7 +49,7 @@ class journal extends React.Component {
           return (
             <div>
               <span style={{ color: 'red' }}>
-                <Popconfirm title="确定要启用吗?" onConfirm={() => this.onDelete(text)}>
+                <Popconfirm title="确定要启用吗?" onConfirm={() => this.statuschange(text, index)}>
                   禁用
               </Popconfirm>
               </span>
@@ -66,7 +60,7 @@ class journal extends React.Component {
           return (
             <div>
               <span style={{ color: 'purple' }}>
-                <Popconfirm title="确定要激活吗?" onConfirm={() => this.onDelete(text)}>
+                <Popconfirm title="确定要激活吗?" onConfirm={() => this.statuschange(text, index)}>
                   未激活
               </Popconfirm>
               </span>
@@ -75,7 +69,7 @@ class journal extends React.Component {
         }
 
       },
-    },
+    }
     ];
   }
   toggle = () => {
@@ -84,22 +78,29 @@ class journal extends React.Component {
     });
   }
 
-  onDelete = (text, key) => {
+  statuschange = (text, index, key) => {
     this.props.form.validateFields({ force: true }, (error) => {
+      console.log(text)
       if (!error) {
         editStatus([
-          this.state.data[text].status,
+          this.state.data[index].id,
           text,
         ]).then(res => {
           if (res.data && res.data.message === 'success') {
-            if (this.state.data[text].status === 0) {
-              this.state.data[text].status = 1
-            } else if (this.state.data[text].status === 1) {
-              this.state.data[text].status = 0
-            } 
-            alert(this.state.data[text].status)
+            // accountview([
+            //   '',
+            // ]).then(res => {
+            //   if (res.data && res.data.message === 'success') {
+            //     for (var i = 0; i < res.data.data.length; i++) {
+            //       if (this.state.data[text].status === 0) {
+            //         this.state.data[text].status = 1
+            //       } else if (this.state.data[text].status === 1) {
+            //         this.state.data[text].status = 0
+            //       }
+            //     }
+            //   }
+            // });
             message.success("状态更改成功");
-
             // setTimeout(() => {
             //   window.location.href = "/account";
             // }, 1000);   

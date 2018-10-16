@@ -276,6 +276,7 @@ class journal extends React.Component {
               <div style={{ float: "right" }}>
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                 <Button>重置</Button>
+                <Button type="primary" style={{ marginLeft: '20px' }}><Link to="/lookchargeman">查看区域主管</Link></Button>
                 <Button type="primary" style={{ marginLeft: '20px' }}><Link to="/addwaterman">添加水务商</Link></Button>
                 <Button type="danger" style={{ marginLeft: '20px',color:'white',background:'red',border:'none' }}><Link to="/addchargeman">添加区域主管</Link></Button>
               </div>

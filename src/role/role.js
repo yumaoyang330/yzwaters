@@ -279,7 +279,7 @@ class journal extends React.Component {
                   角色简写：<Input placeholder="请输入角色名称英文简写" style={{ width: '100%', marginTop: '10px', marginBottom: '10px' }} id="roleabbr" />
                 </Modal>
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/roleassignment">角色分配</Link></Button>
-                <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/power">权限列表</Link></Button>
+                {/* <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/power">权限列表</Link></Button> */}
                 <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/powerassignment">权限分配</Link></Button>
               </div>
               <div className="derive">

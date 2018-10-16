@@ -34,6 +34,7 @@ import newadd from './newadd/newadd';
 import parameter from './parameter/parameter';
 import addwaterman from './addwaterman/addwaterman';
 import addchargeman from './addchargeman/addchargeman';
+import lookchargeman from './lookchargeman/lookchargeman';
 
 ReactDOM.render(
   <Router >
@@ -69,6 +70,7 @@ ReactDOM.render(
         <Route path='/addwaterman' component={addwaterman} />
         <Route path='/power' component={power} />
         <Route path='/powerassignment' component={powerassignment} />
+        <Route path='/lookchargeman' component={lookchargeman} />
       {/* </Route>
       <Route path="/ota"> */}
         <Route path='/history' component={history} />

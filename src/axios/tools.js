@@ -44,11 +44,16 @@ function checkCode(res) {
 }
 
 export default {
-  post(url, data) {
+  post(url, data,token) {
     return axios({
+      // headers: {
+      //   'Authorization': 'Bearer ' + token,
+      //   "Content-type":" application/json"
+      //  },
       method: 'post',
-      header: {},
+      // header: {},
       // baseURL: 'https://cnodejs.org/api/v1',
+      // Authorization:'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
       url,
       data: qs.stringify(data),
       timeout: 10000,

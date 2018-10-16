@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Input } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, message, Select, Input } from 'antd';
 import { Link } from 'react-router-dom';
+import { simpleuser,useradd } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './newaccount.css';
@@ -12,7 +13,8 @@ function handleChange(value) {
 }
 
 
-var accounttype = ['超级管理员', '管理员',];
+var accounttype = [];
+// var accounttype=['单位管理员', '单位滤芯维护人员', '区级管理员', '超级管理员'];
 const { TextArea } = Input;
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
@@ -24,7 +26,7 @@ class journal extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
-      usertype: accounttype[0],
+      accounttype: '',
       size: 'default',
     };
   }
@@ -33,7 +35,45 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
-  
+
+
+  submit = () => {
+    console.log
+    let phone = document.getElementById('phone_num').value;
+    let nameval = document.getElementById('name_val').value;
+    var telrule = /^[1][3,4,5,7,8][0-9]{9}$/;
+    var namerule = /^[\u4E00-\u9FA5A-Za-z]+$/;
+    phone.toString();
+    console.log(phone)
+    this.props.form.validateFields({ force: true }, (error, fieldsValue) => {
+      if (!telrule.test(phone)) {
+        message.error('您输入的手机号码不合法');
+        return;
+      }
+      if (!namerule.test(nameval)) {
+        message.error('请输入您的真实姓名');
+        return;
+      }
+      if (!error) {
+        useradd([
+
+        ]).then(res => {
+          if (res.data && res.data.status === 1) {
+            message.success('账号创建成功');
+            setTimeout(() => {
+              window.location.href = "/contact";
+            }, 1000);
+          } else {
+            message.error('账号创建失败');
+          }
+        });
+      } else {
+        message.error('账号创建失败');
+      }
+    });
+  }
+
+
   componentWillMount = () => {
     document.title = "添加账户";
     function showTime() {
@@ -44,18 +84,26 @@ class journal extends React.Component {
       document.getElementById("mytime").innerText = year + "年" + month + "月" + date + " " + nowtime.toLocaleTimeString();
     }
     setInterval(showTime, 1000);
+
+    this.props.form.validateFields({ force: true }, (error) => {
+      if (!error) {
+        simpleuser([]).then(res => {
+          if (res.data && res.data.message === 'success') {
+            for (var i = 0; i < res.data.data.length; i++) {
+              accounttype.push(res.data.data[i].name)
+            }
+            console.log(accounttype)
+          }
+        });
+      }
+    })
+
   }
   render() {
     const { size } = this.state;
-    const productname = accounttype.map(productnames => <Option key={productnames}>{productnames}</Option>);
-    const { getFieldProps, getFieldError, getFieldDecorator } = this.props.form;
-    const { selectedRowKeys } = this.state;
-    const rowSelection = {
-      selectedRowKeys,
-      onChange: this.onSelectChange,
-    };
-    const hasSelected = selectedRowKeys > 0;
-
+    console.log(accounttype)
+    // const account = accounttype.map((province, id) => <Option key={province.id}>{province.name}</Option>);
+    const account = accounttype.map(accounts => <Option key={accounts}>{accounts}</Option>);
     return (
       <div id="newaccountbody" >
         <Layout>
@@ -170,12 +218,11 @@ class journal extends React.Component {
                         mode="tags"
                         size={size}
                         style={{ width: '60%' }}
-                        placeholder="Please select"
-                        defaultValue={accounttype[0]} 
+                        placeholder="请选择账户类型"
                         onChange={handleChange}
-                        // onChange={this.usertypes}
+                      // onChange={this.usertypes}
                       >
-                       {productname}
+                        {account}
                       </Select>
                     </div>
                     <div className='addinput'>
@@ -190,7 +237,7 @@ class journal extends React.Component {
                       <Input placeholder="123745758" style={{ width: '60%' }}
                         id="phone_num"
                         placeholder="请输入您的手机号"
-                        />
+                      />
                     </div>
                     <div className='addinput'>
                       <span>邮箱：</span>

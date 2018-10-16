@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Icon, Menu, Layout, Button, Tabs, Input, Select, Table, Modal, message } from 'antd';
-import { wirelessbasic, generalbasic, collectorbasic, getLifecycleDetail, getHistoryReading } from '../axios';
+import { wirelessbasic, generalbasic, collectorbasic, getLifecycleDetail, getHistoryReading, getDeviceDetail } from '../axios';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
@@ -9,7 +9,21 @@ import './basic.css';
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
+
+
 const TabPane = Tabs.TabPane;
+
+
+// function timestampToTime(timestamp) {
+//   var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+//   var Y = date.getFullYear() + '-';
+//   var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+//   var D = date.getDate() + ' ';
+//   var h = date.getHours() + ':';
+//   var m = date.getMinutes() + ':';
+//   var s = date.getSeconds();
+//   return Y + M + D;
+// }
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -22,6 +36,29 @@ class journal extends React.Component {
       }, {
         title: '生命周期',
         dataIndex: 'status',
+        render: (text) => {
+          if (text === 1) {
+            return (
+              <div>
+                <span style={{ color: 'green' }}>设备入库</span>
+              </div>
+            )
+          }
+          if (text === 2) {
+            return (
+              <div>
+                <span style={{ color: 'green' }}>设备出库</span>
+              </div>
+            )
+          }
+          if (text === 3) {
+            return (
+              <div>
+                <span style={{ color: 'purple' }}>设备安装</span>
+              </div>
+            )
+          }
+        }
       }, {
         title: '操作时间',
         dataIndex: 'date',
@@ -36,9 +73,33 @@ class journal extends React.Component {
       }, {
         title: '生命周期',
         dataIndex: 'status',
+        render: (text) => {
+          if (text === 1) {
+            return (
+              <div>
+                <span style={{ color: 'green' }}>设备入库</span>
+              </div>
+            )
+          }
+          if (text === 2) {
+            return (
+              <div>
+                <span style={{ color: 'green' }}>设备出库</span>
+              </div>
+            )
+          }
+          if (text === 3) {
+            return (
+              <div>
+                <span style={{ color: 'purple' }}>设备安装</span>
+              </div>
+            )
+          }
+        }
       }, {
         title: '操作时间',
         dataIndex: 'date',
+
       }, {
         title: '操作员',
         dataIndex: 'userId',
@@ -132,17 +193,19 @@ class journal extends React.Component {
           <a onClick={() => this.showModal(text)}
           >详情</a>
           <Modal
-            title="联系方式"
+            title="无线单表其他信息"
             visible={this.state.visible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
             mask={false}
           >
-            <p>姓名:{this.state.name}</p>
-            <p>电话:{this.state.phone}</p>
-            <p>邮箱:{this.state.email}</p>
-            <p>地址:{this.state.organization}</p>
-            <p>备注:{this.state.content}</p>
+            <p>水表版本:{this.state.sbbb}</p>
+            <p>电路板号:{this.state.dlbh}</p>
+            <p>处部编号:{this.state.cbbh}</p>
+            <p>正面编号:{this.state.zmbh}</p>
+            <p>程序版本:{this.state.cxbb}</p>
+            <p>IMEI号:{this.state.imei}</p>
+            <p>ICCID:{this.state.iccid}</p>
           </Modal>
         </div>
     }];
@@ -257,18 +320,23 @@ class journal extends React.Component {
   }
   state = { visible: false }
   showModal = (text) => {
-    for (var i = 0; i < this.state.dataSource.length; i++) {
-      if (this.state.dataSource[i].id === text) {
+    getDeviceDetail([
+      text,
+      2,
+    ]).then(res => {
+      if (res.data && res.data.message === 'success') {
         this.setState({
           visible: true,
-          // phone: this.state.dataSource[i].resPerson.phone,
-          // name: this.state.dataSource[i].resPerson.name,
-          // email: this.state.dataSource[i].resPerson.email,
-          // organization: this.state.dataSource[i].resPerson.organization,
-          // content: this.state.dataSource[i].resPerson.content,
+          sbbb: res.data.data.ipPort,
+          dlbh: res.data.data.ipPort,
+          cbbh: res.data.data.ipPort,
+          zmbh: res.data.data.ipPort,
+          cxbb: res.data.data.reportingInterval,
+          imei: res.data.data.imei,
+          iccid: res.data.data.iccid,
         });
       }
-    }
+    });
   }
   state = { lookshow: false }
   lifeshowModal = (text) => {
@@ -283,13 +351,13 @@ class journal extends React.Component {
         });
       }
     });
-    for (var i = 0; i < this.state.dataSource.length; i++) {
-      if (this.state.dataSource[i].id === text) {
+    for (var i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].id === text) {
         this.setState({
           lookshow: true,
-          name: this.state.dataSource[i].linkman,
-          phone: this.state.dataSource[i].phone,
-          email: this.state.dataSource[i].email,
+          name: this.state.data[i].linkman,
+          phone: this.state.data[i].phone,
+          email: this.state.data[i].email,
         });
       }
     }
@@ -307,13 +375,13 @@ class journal extends React.Component {
         });
       }
     });
-    for (var i = 0; i < this.state.dataSource.length; i++) {
-      if (this.state.dataSource[i].id === text) {
+    for (var i = 0; i < this.state.dbdata.length; i++) {
+      if (this.state.dbdata[i].id === text) {
         this.setState({
           dblookshow: true,
-          name: this.state.dataSource[i].linkman,
-          phone: this.state.dataSource[i].phone,
-          email: this.state.dataSource[i].email,
+          name: this.state.dbdata[i].linkman,
+          phone: this.state.dbdata[i].phone,
+          email: this.state.dbdata[i].email,
         });
       }
     }
@@ -332,13 +400,13 @@ class journal extends React.Component {
         });
       }
     });
-    for (var i = 0; i < this.state.dataSource.length; i++) {
-      if (this.state.dataSource[i].id === text) {
+    for (var i = 0; i < this.state.dbdata.length; i++) {
+      if (this.state.dbdata[i].id === text) {
         this.setState({
           historyvisible: true,
-          name: this.state.dataSource[i].linkman,
-          phone: this.state.dataSource[i].phone,
-          email: this.state.dataSource[i].email,
+          name: this.state.dbdata[i].linkman,
+          phone: this.state.dbdata[i].phone,
+          email: this.state.dbdata[i].email,
         });
       }
     }

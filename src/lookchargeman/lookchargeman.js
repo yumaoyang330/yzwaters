@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, Input, Popconfirm,Checkbox  } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Popconfirm, Select, Table, Input, message } from 'antd';
+import { showchargewater } from '../axios';
 import { Link } from 'react-router-dom';
-import { userrole,simpleuser } from '../axios';
 import moment from 'moment';
 import { createForm } from 'rc-form';
-import './roleassignment.css';
+import './lookchargeman.css';
 
-
-const CheckboxGroup = Checkbox.Group;
-const plainOptions = [];
 const Option = Select.Option;
 const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const TabPane = Tabs.TabPane;
-
 class journal extends React.Component {
   constructor(props) {
     super(props);
@@ -21,64 +17,23 @@ class journal extends React.Component {
       collapsed: false,
     };
     this.columns = [{
-      title: '账号',
+      title: '所在区域',
+      dataIndex: 'district',
+    }, {
+      title: '所属水务商',
+      dataIndex: 'water_merchant',
+    }, {
+      title: '账户名',
       dataIndex: 'username',
     }, {
       title: '用户姓名',
       dataIndex: 'name',
     }, {
-      title: '状态',
-      dataIndex: 'status',
-      render: (text) => {
-        if (text === 1) {
-          return (
-            <div>
-              <span style={{ color: 'green' }}>启用</span>
-            </div>
-          )
-        }
-        if (text === 0) {
-          return (
-            <div>
-              <span style={{ color: 'red' }}>禁用</span>
-            </div>
-          )
-        }
-        if (text === 3) {
-          return (
-            <div>
-              <span style={{ color: 'purple' }}>被替换</span>
-            </div>
-          )
-        }
-      }
+      title: '联系方式',
+      dataIndex: 'phone',
     }, {
-      title: '拥有的角色',
-      dataIndex: '拥有的角色',
-    }, {
-      title: '操作',
-      dataIndex: 'status',
-      render: (text) => {
-        return (
-          <div>
-            <span onClick={this.showModal} style={{ color: 'blue', cursor: 'pointer' }}>
-              选择角色
-            </span>
-            <span style={{ marginLeft: '10px' }}>
-              <Modal
-                title="添加角色"
-                visible={this.state.visible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-                okText="Save"
-                mask={false}
-              >
-                <CheckboxGroup options={plainOptions} value={this.state.checkedList} onChange={this.onChange} />
-              </Modal>
-            </span>
-          </div>
-        );
-      },
+      title: '邮箱',
+      dataIndex: 'email',
     }
     ];
   }
@@ -87,38 +42,11 @@ class journal extends React.Component {
       collapsed: !this.state.collapsed,
     });
   }
-  state = { visible: false }
 
-  showModal = () => {
-    this.setState({
-      visible: true,
-    });
-  }
 
-  handleOk = (e) => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  }
 
-  onChange = (checkedList) => {
-    console.log(checkedList)
-    this.setState({
-      checkedList,
-      indeterminate: !!checkedList.length && (checkedList.length < plainOptions.length),
-      checkAll: checkedList.length === plainOptions.length,
-    });
-  }
-
-  handleCancel = (e) => {
-    console.log(e);
-    this.setState({
-      visible: false,
-    });
-  }
   componentWillMount = () => {
-    document.title = "角色分配";
+    document.title = "区域主管";
     function showTime() {
       let nowtime = new Date();
       let year = nowtime.getFullYear();
@@ -130,7 +58,7 @@ class journal extends React.Component {
 
     this.props.form.validateFields({ force: true }, (error) => {
       if (!error) {
-        userrole([
+        showchargewater([
           '',
         ]).then(res => {
           if (res.data && res.data.message === 'success') {
@@ -139,21 +67,6 @@ class journal extends React.Component {
               data: res.data.data,
               num: res.data.data.length,
             });
-          }
-        });
-      }
-    })
-
-
-
-    this.props.form.validateFields({ force: true }, (error) => {
-      if (!error) {
-        simpleuser([]).then(res => {
-          if (res.data && res.data.message === 'success') {
-            for (var i = 0; i < res.data.data.length; i++) {
-              plainOptions.push(res.data.data[i].name)
-            }
-            console.log(plainOptions)
           }
         });
       }
@@ -182,7 +95,7 @@ class journal extends React.Component {
       };
     });
     return (
-      <div id="rolebody" >
+      <div id="accountbody" >
         <Layout>
           <Sider
             trigger={null}
@@ -192,7 +105,7 @@ class journal extends React.Component {
             <div />
             <div className="Layout-left">
               <Menu
-                defaultSelectedKeys={['8']}
+                defaultSelectedKeys={['6']}
                 defaultOpenKeys={['sub3']}
                 mode="inline"
                 theme="dark"
@@ -265,18 +178,16 @@ class journal extends React.Component {
             </div>
             </Header>
             <div className="nav">
-              用户管理 / 角色分配
+              用户管理 / 水务商 / 区域主管
             </div>
             <div className="tit">
-              角色分配
+              区域主管
             </div>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-              <div >
-                用户名称：<Input placeholder="输入用户昵称 / 用户帐号" style={{ width: '20%', marginLeft: '10px', marginRight: '40px' }} />
+            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280, paddingTop: '10px' }}>
+              所属水务商:<Input placeholder="请输入账户类别" style={{ width: '20%', marginLeft: '10px' }} id="accounttype" />
+              <div style={{ float: "right" }}>
                 <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
-                <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/role">角色列表</Link></Button>
-                {/* <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/power">权限列表</Link></Button> */}
-                <Button style={{ marginLeft: '20px', color: 'white', backgroundColor: '#5cb85c', borderColor: '#5cb85c', }}><Link to="/powerassignment">权限分配</Link></Button>
+                <Button>重置</Button>
               </div>
               <div className="derive">
                 <Icon type="info-circle-o" />

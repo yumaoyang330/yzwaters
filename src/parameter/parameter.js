@@ -221,12 +221,7 @@ class journal extends React.Component {
     ];
   }
 
-  typeChange = (date, dateString) => {
-    this.setState({
-      selecttype: date,
-      selectnum: typenum[date],
-    });
-  }
+
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,

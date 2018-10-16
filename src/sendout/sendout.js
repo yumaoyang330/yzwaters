@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Button, Tabs, Cascader, Select, Table, DatePicker, Input } from 'antd';
+import { Icon, Menu, Layout, Button, Tabs, Modal, Select, Table, DatePicker, Input } from 'antd';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { createForm } from 'rc-form';
 import './sendout.css';
 
+function onChange(date, dateString) {
+  console.log(date, dateString);
+}
 
 
 const dateFormat = 'YYYY/MM/DD HH:mm:ss';
@@ -39,9 +42,25 @@ class journal extends React.Component {
     }
     ];
   }
+  handleOk = (e) => {
+    this.setState({
+      visible: false,
+    });
+  }
+  handleCancel = (e) => {
+    console.log(e);
+    this.setState({
+      visible: false,
+    });
+  }
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
+    });
+  }
+  showModal = (text) => {
+    this.setState({
+      visible: true,
     });
   }
   componentWillMount = () => {
@@ -93,7 +112,7 @@ class journal extends React.Component {
                 theme="dark"
                 inlineCollapsed={this.state.collapsed}
               >
-     <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
+                <Menu.Item key="0" style={{ background: '#1890ff', color: 'white', fontSize: "18px", display: "block", width: "94%", borderRadius: '5px', marginLeft: "3%", marginRight: '3%' }}>
                   <Icon type="windows" />
                   <span>水表管理平台</span>
                 </Menu.Item>
@@ -177,6 +196,23 @@ class journal extends React.Component {
                 />
                 单号查询:<Input placeholder="请输入单号" style={{ width: '20%', marginLeft: '10px', marginRight: '10px' }} />
                 <div style={{ float: "right" }}>
+                  <Button type="danger" style={{ marginRight: '20px', color: 'white', background: 'red', border: 'none' }} onClick={() => this.showModal()}>添加订单</Button>
+                  <Modal
+                    title="添加订单"
+                    visible={this.state.visible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    mask={false}
+                  >
+                    <p style={{marginTop:'5px',marginBottom:'5px'}}>订单号:</p>
+                    <Input type="text"/>
+                    <p style={{marginTop:'5px',marginBottom:'5px'}}>订单内容:</p>
+                    <Input type="text"/>
+                    <p style={{marginTop:'5px',marginBottom:'5px'}}>发货时间:</p>
+                    <DatePicker onChange={onChange}  style={{width:'100%'}} placeholder="请选择发货时间"/>
+                    <p style={{marginTop:'5px',marginBottom:'5px'}}>发货地址:</p>
+                    <Input type="text"/>
+                  </Modal>
                   <Button type="primary" style={{ marginRight: '20px' }} onClick={this.equipmentquery}>查询</Button>
                   <Button>重置</Button>
                 </div>

@@ -43,11 +43,24 @@ class journal extends React.Component {
             const dataSource = [...this.state.datas];
             this.setState({
               num: this.state.num - 1,
-              dataSource: dataSource.filter(item => item.key !== key)
+              datas: dataSource.filter(item => item.key !== key),
             });
-            setTimeout(() => {
-              window.location.href = "/product";
-            }, 1000);
+            product([
+              '',
+              '',
+              '',
+              '',
+              '',
+              '',
+            ]).then(res => {
+              if (res.data && res.data.message === 'success') {
+                this.setState({
+                  datas: res.data.data,
+                  num: res.data.data.length,
+                });
+              } 
+    
+            });
           } 
 
         });

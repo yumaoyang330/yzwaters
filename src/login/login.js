@@ -7,6 +7,15 @@ import './login.css';
 
 const FormItem = Form.Item;
 
+// function b64EncodeUnicode(str) {
+//   return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+//     function (match, p1) {
+//       return String.fromCharCode('0x' + p1);
+//     }));
+// }
+
+
+
 
 class logins extends Component {
   componentWillMount = () => {
@@ -44,39 +53,39 @@ class logins extends Component {
       visible: true,
     });
   }
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (values.userName === "") {
-        message.error("请输入账号");
-      }
-      else if (values.password === "") {
-        message.error("请输入密码");
-      }
-      if (!err) {
-        login([
-          values.userName,
-          values.password,
-        ]).then(res => {
-          if (res.data && res.data.status === 'success') {
-            console.log(res.data)
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('type', res.data.type);
-            localStorage.setItem('realname', res.data.realName);
-            window.location.href = "/homepage";
-          }
-          else {
-            if (res.data && res.data.status === 23) {
-              message.error("不存在此用户");
-            }
-            if (res.data && res.data.status === 2) {
-              message.error("密码错误");
-            }
-          }
-        });
-      }
-    });
-  }
+  // handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   this.props.form.validateFields((err, values) => {
+  //     if (values.userName === "") {
+  //       message.error("请输入账号");
+  //     }
+  //     else if (values.password === "") {
+  //       message.error("请输入密码");
+  //     }
+  //     if (!err) {
+  //       login([
+  //         values.userName,
+  //         values.password,
+  //       ]).then(res => {
+  //         if (res.data && res.data.status === 'success') {
+  //           console.log(res.data)
+  //           localStorage.setItem('token', res.data.token);
+  //           localStorage.setItem('type', res.data.type);
+  //           localStorage.setItem('realname', res.data.realName);
+  //           window.location.href = "/homepage";
+  //         }
+  //         else {
+  //           if (res.data && res.data.status === 23) {
+  //             message.error("不存在此用户");
+  //           }
+  //           if (res.data && res.data.status === 2) {
+  //             message.error("密码错误");
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
@@ -105,8 +114,8 @@ class logins extends Component {
               <Checkbox>记住密码</Checkbox>
             )}
             <Button type="primary" htmlType="submit" className="login-form-button"  >
-              {/* <Link to="/product">登录</Link> */}
-              登录
+              <Link to="/product">登录</Link>
+              {/* 登录 */}
           </Button>
             <a style={{ display: 'block', textAlign: 'right' }} onClick={this.showModal}>联系管理员</a>
             <Modal
